@@ -31,11 +31,13 @@ percTrain = 0.1;                % Percentage of bits transmitted that are to be 
 % given by Mathworks
 trellis          = poly2trellis([5 4], [23 35 0; 0 5 13]);
 traceback_length = 20;          % Longer traceback yields better results, but longer computation time.
+
 %% Performance Metrics
 % Create a vector to store the BER computed during each iteration
 berVec = zeros(numIter, lenSNR);
 
 %% Defining a Channel
+% Note: Parameters work for cases 0-1, not yet for 2-3.
 switch channel_ID
     case 0      % No channel
                 % No ISI
@@ -55,8 +57,6 @@ switch channel_ID
     otherwise   % If improper ID, assume no channel
         chan = 1;
 end
-
-%% Preparing a Trellis
 
 %% Simulation
 % Run the simulation numIter amount of times
