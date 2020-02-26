@@ -1,0 +1,900 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>IEEE 802.11a Simulation</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-02-26"><meta name="DC.source" content="IEEE_802_11a_Simulation_ASLevin.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>IEEE 802.11a Simulation</h1><!--introduction--><p>Alon S. Levin ECE-408 Wireless Communications Spring 2020</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare Environment</a></li><li><a href="#2">Timing related Parameters</a></li><li><a href="#3">Number of Trials</a></li><li><a href="#5">RATE-Dependent Parameters</a></li><li><a href="#7">SNR Values</a></li><li><a href="#9">Random Signal Generation</a></li><li><a href="#10">Convolutional Encoding</a></li><li><a href="#11">Interleaving</a></li><li><a href="#12">Baseband Modulation</a></li><li><a href="#13">OFDM Modulation (IFFT + Cyclic Prefix)</a></li><li><a href="#14">RF Up-Conversion</a></li><li><a href="#15">Channel</a></li><li><a href="#16">RF Down-Conversion</a></li><li><a href="#17">OFDM Demodulation (Cyclic Prefix + FFT)</a></li><li><a href="#18">Baseband Demodulation</a></li><li><a href="#19">De-Interleaving</a></li><li><a href="#20">Viterbi Decoder</a></li><li><a href="#21">Bit Error Rate</a></li><li><a href="#25">Plot BER Curves</a></li></ul></div><h2 id="1">Prepare Environment</h2><pre class="codeinput">clear, clc, close <span class="string">all</span>       <span class="comment">% Clear all current variables and outputs</span>
+format <span class="string">compact</span>              <span class="comment">% Prepare command line output</span>
+profile <span class="string">on</span>                  <span class="comment">% Allow for timing information</span>
+<span class="comment">%rng default                 % Control pRNG to provide same results each time</span>
+
+BER = zeros(8, 20);         <span class="comment">% Prepare BER matrix</span>
+</pre><h2 id="2">Timing related Parameters</h2><p>Source: IEEE 802.11a-1999 17.3.2.3, Table 79</p><pre class="codeinput"><span class="comment">% Variables</span>
+<span class="comment">%   N_sd        - Number of data subcarriers</span>
+<span class="comment">%   N_sp        - Number of pilot subcarriers</span>
+<span class="comment">%   delta_f     - Subcarrier frequency spacing [Hz]</span>
+<span class="comment">%   T_fft       - IFFT/FFT period [sec]</span>
+<span class="comment">%   T_gi        - GI/CP duration [sec]</span>
+<span class="comment">%   T_signal    - Duration of the signal BPSK-OFDM signal [sec]</span>
+<span class="comment">%   N_cp        - Number of data points in cyclic prefix</span>
+
+N_sd     = 48;
+N_sp     = 4;
+delta_f  = 0.3125e6;
+T_fft    = 1/delta_f;
+T_gi     = 0.8e-6;
+T_signal = T_gi + T_fft;
+</pre><h2 id="3">Number of Trials</h2><pre class="codeinput">numTrials = 20;
+
+<span class="keyword">for</span> trial_ticker = 1:numTrials
+</pre><pre class="codeinput">    <span class="comment">%fprintf('=== BEGINNING TRIAL %i === \n', trial_ticker)</span>
+</pre><h2 id="5">RATE-Dependent Parameters</h2><p>Source: IEEE 802.11a-1999 17.3.2.2, Table 78</p><pre class="codeinput">    <span class="comment">% Desired data rate [Mbits/s]</span>
+    <span class="comment">%   One of {6, 9, 12, 18, 24, 36, 48, 54}</span>
+    Data_Rate_all = [6, 9, 12, 18, 24, 36, 48, 54];
+
+    <span class="keyword">for</span> Data_Rate_ticker = 1:length(Data_Rate_all)
+</pre><pre class="codeinput">        Data_Rate = Data_Rate_all(Data_Rate_ticker);
+
+        <span class="comment">% Other Parameters</span>
+        <span class="comment">%   Modulation  - Modulation scheme</span>
+        <span class="comment">%   R           - Coding rate</span>
+        <span class="comment">%   N_bpsc      - Coded bits per subcarrier</span>
+        <span class="comment">%   N_cbps      - Coded bits per OFDM symbol</span>
+        <span class="comment">%   N_dbps      - Data bits per OFDM symbol</span>
+        <span class="keyword">switch</span> Data_Rate
+            <span class="keyword">case</span> 6
+                Modulation  = <span class="string">"BPSK"</span>;
+                R           = 1/2;
+                N_bpsc      = 1;
+                N_cbps      = 48;
+                N_dbps      = 24;
+            <span class="keyword">case</span> 9
+                Modulation  = <span class="string">"BPSK"</span>;
+                R           = 3/4;
+                N_bpsc      = 1;
+                N_cbps      = 48;
+                N_dbps      = 36;
+            <span class="keyword">case</span> 12
+                Modulation  = <span class="string">"QPSK"</span>;
+                R           = 1/2;
+                N_bpsc      = 2;
+                N_cbps      = 96;
+                N_dbps      = 48;
+            <span class="keyword">case</span> 18
+                Modulation  = <span class="string">"QPSK"</span>;
+                R           = 3/4;
+                N_bpsc      = 2;
+                N_cbps      = 96;
+                N_dbps      = 72;
+            <span class="keyword">case</span> 24
+                Modulation  = <span class="string">"16-QAM"</span>;
+                R           = 1/2;
+                N_bpsc      = 4;
+                N_cbps      = 192;
+                N_dbps      = 96;
+            <span class="keyword">case</span> 36
+                Modulation  = <span class="string">"16-QAM"</span>;
+                R           = 3/4;
+                N_bpsc      = 4;
+                N_cbps      = 192;
+                N_dbps      = 144;
+            <span class="keyword">case</span> 48
+                Modulation  = <span class="string">"64-QAM"</span>;
+                R           = 2/3;
+                N_bpsc      = 6;
+                N_cbps      = 288;
+                N_dbps      = 192;
+            <span class="keyword">case</span> 54
+                Modulation  = <span class="string">"64-QAM"</span>;
+                R           = 3/4;
+                N_bpsc      = 6;
+                N_cbps      = 288;
+                N_dbps      = 216;
+        <span class="keyword">end</span>
+</pre><h2 id="7">SNR Values</h2><p>We will use additive white Gaussian noise to model the channel</p><pre class="codeinput">        SNR = linspace(-10, 9, 20);
+
+        <span class="keyword">for</span> SNR_ticker = 1:length(SNR)
+</pre><pre class="codeinput">            currSNR = SNR(SNR_ticker);
+
+
+            <span class="comment">%fprintf('== Data Rate %i Mbps ==\n', Data_Rate)</span>
+            <span class="comment">%fprintf('= SNR %i dB =\n', currSNR)</span>
+
+            <span class="comment">%fprintf('TRANSMITTER: \n\t')</span>
+</pre><h2 id="9">Random Signal Generation</h2><p>Generate a binary stream of length N_dbps.</p><pre class="codeinput">            <span class="comment">%fprintf('Signal Generation: ')</span>
+
+            signal_original_bi = randi([0,1], N_dbps, 1);
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="10">Convolutional Encoding</h2><p>Source: IEEE 802.11a-1999 17.3.5.5</p><pre class="codeinput">            <span class="comment">%fprintf('Convolutional Encoding: ')</span>
+
+            <span class="comment">% Industry-standard generator polynomials, in octal</span>
+            g0 = 133;
+            g1 = 171;
+            k  = 7;
+            trellis = poly2trellis(k, [g0, g1]);
+
+            <span class="comment">% Create and apply encoders</span>
+            <span class="comment">% Output should be of length N_cbps</span>
+            <span class="keyword">switch</span> R
+                <span class="keyword">case</span> 1/2
+                    signal_tx_encoded = convenc(signal_original_bi, trellis);
+                <span class="keyword">case</span> 3/4
+                    pPatternMat = [1 1 0 1 1 0 1 1 0; <span class="keyword">...</span>
+                                   1 0 1 1 0 1 1 0 1];
+                    pPatternVec = reshape(pPatternMat, 18, 1);
+                    signal_tx_encoded = convenc(signal_original_bi, trellis, pPatternVec);
+
+                <span class="keyword">case</span> 2/3
+                    pPatternMat = [1 1 1 1 1 1; <span class="keyword">...</span>
+                                   1 0 1 0 1 0];
+                    pPatternVec = reshape(pPatternMat, 12, 1);
+                    signal_tx_encoded = convenc(signal_original_bi, trellis, pPatternVec);
+            <span class="keyword">end</span>
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="11">Interleaving</h2><p>Source: IEEE 802.11a-1999 17.3.5.6</p><pre class="codeinput">            <span class="comment">%fprintf('Interleaving: ')</span>
+
+            <span class="comment">% Matrix Interleaver</span>
+            signal_tx_interleaved_mat = matintrlv(signal_tx_encoded, N_cbps/16, 16);
+
+            <span class="comment">% General Block Interleaver, Permutations 1&amp;2</span>
+            signal_tx_interleaved_mid = zeros(size(signal_tx_interleaved_mat));
+            signal_tx_interleaved = zeros(size(signal_tx_interleaved_mid));
+
+            <span class="keyword">for</span> k = 0:N_cbps-1
+                i = (N_cbps/16)*mod(k, 16) + floor(k/16);
+                signal_tx_interleaved_mid(i+1) = signal_tx_interleaved_mat(k+1);
+            <span class="keyword">end</span>
+            s = max(N_bpsc/2, 1);
+            <span class="keyword">for</span> i = 0:N_cbps-1
+                j = s*floor(i/s) + mod(i+N_cbps-floor(16*i/N_cbps), s);
+                signal_tx_interleaved(j+1) = signal_tx_interleaved_mid(i+1);
+            <span class="keyword">end</span>
+            clear <span class="string">i</span> <span class="string">j</span> <span class="string">k</span> <span class="string">s</span>
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="12">Baseband Modulation</h2><p>Source: IEEE 802.11a-1999 17.3.5.7-8</p><pre class="codeinput">            <span class="comment">%fprintf('Baseband Modulation: ')</span>
+
+            <span class="comment">% Apply modulation scheme</span>
+            <span class="keyword">switch</span> Modulation
+                <span class="keyword">case</span> <span class="string">"BPSK"</span>
+                    signal_tx_modulated = qammod(signal_tx_interleaved, 2, <span class="string">'gray'</span>);
+                <span class="keyword">case</span> <span class="string">"QPSK"</span>
+                    signal_tx_symbols = bi2de(reshape(signal_tx_interleaved, length(signal_tx_interleaved)/log2(4), log2(4)));
+                    signal_tx_modulated = qammod(signal_tx_symbols, 4, <span class="string">'gray'</span>);
+                <span class="keyword">case</span> <span class="string">"16-QAM"</span>
+                    signal_tx_symbols = bi2de(reshape(signal_tx_interleaved, length(signal_tx_interleaved)/log2(16), log2(16)));
+                    signal_tx_modulated = qammod(signal_tx_symbols, 16, <span class="string">'gray'</span>);
+                <span class="keyword">case</span> <span class="string">"64-QAM"</span>
+                    signal_tx_symbols = bi2de(reshape(signal_tx_interleaved, length(signal_tx_interleaved)/log2(64), log2(64)));
+                    signal_tx_modulated = qammod(signal_tx_symbols, 64, <span class="string">'gray'</span>);
+            <span class="keyword">end</span>
+
+            <span class="comment">% Generate random BPSK-modulated pilot subcarriers</span>
+            pilot_symbols_modulated = 2*randi([0,1], 4, 1) - 1;
+
+            <span class="comment">% Normalize</span>
+            <span class="keyword">switch</span> Modulation
+                <span class="keyword">case</span> <span class="string">"BPSK"</span>
+                    K_MOD = 1;
+                <span class="keyword">case</span> <span class="string">"QPSK"</span>
+                    K_MOD = 1/sqrt(2);
+                <span class="keyword">case</span> <span class="string">"16-QAM"</span>
+                    K_MOD = 1/sqrt(10);
+                <span class="keyword">case</span> <span class="string">"64-QAM"</span>
+                    K_MOD = 1/sqrt(42);
+            <span class="keyword">end</span>
+            signal_tx_modulated = K_MOD * signal_tx_modulated;
+            pilot_symbols_modulated = K_MOD * pilot_symbols_modulated;
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="13">OFDM Modulation (IFFT + Cyclic Prefix)</h2><p>Source: IEEE 802.11a-1999 17.3.5.9</p><pre class="codeinput">            <span class="comment">%fprintf('OFDM Modulation: ')</span>
+
+            <span class="comment">% Combine data symbols and pilot symbols</span>
+            combined_signal = [signal_tx_modulated(1:5); <span class="keyword">...</span><span class="comment">    % -26 --&gt; -22</span>
+                               pilot_symbols_modulated(1); <span class="keyword">...</span><span class="comment">  % -21</span>
+                               signal_tx_modulated(6:18); <span class="keyword">...</span><span class="comment">   % -20 --&gt; -08</span>
+                               pilot_symbols_modulated(2); <span class="keyword">...</span><span class="comment">  % -07</span>
+                               signal_tx_modulated(19:24); <span class="keyword">...</span><span class="comment">  % -06 --&gt; -01</span>
+                               signal_tx_modulated(25:30); <span class="keyword">...</span><span class="comment">  %  01 --&gt;  06</span>
+                               pilot_symbols_modulated(3); <span class="keyword">...</span><span class="comment">  %  07</span>
+                               signal_tx_modulated(31:43); <span class="keyword">...</span><span class="comment">  %  08 --&gt;  20</span>
+                               pilot_symbols_modulated(4); <span class="keyword">...</span><span class="comment">  %  21</span>
+                               signal_tx_modulated(44:48)];     <span class="comment">%  22 --&gt;  26</span>
+
+            <span class="comment">% Apply the IFFT</span>
+            IFFT_input = [zeros(1,1); <span class="keyword">...</span><span class="comment">               % Port  0    : Null</span>
+                          combined_signal(27:52); <span class="keyword">...</span><span class="comment">   % Ports 1-26 : 1   &gt; 26</span>
+                          zeros(11, 1); <span class="keyword">...</span><span class="comment">             % Ports 27-37: Null</span>
+                          combined_signal(1:26)];       <span class="comment">% Ports 38-63: -26 &gt; -1</span>
+
+            IFFT_output = ifft(IFFT_input);
+
+            <span class="comment">% Add the Cyclic Prefix</span>
+            <span class="comment">% The cyclic prefix fits into the guard time T_gi, so the number of</span>
+            <span class="comment">% samples in it should be a ratio of T_gi to T_fft times the number</span>
+            <span class="comment">% of FFT samples</span>
+            N_cp = (T_gi/T_fft) * 64;
+            signal_tx_OFDM = [IFFT_output(64-N_cp+1:64); <span class="keyword">...</span>
+                              IFFT_output];
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="14">RF Up-Conversion</h2><p>Source: IEEE 802.11a-1999 17.3.8.3</p><pre class="codeinput">            <span class="comment">%fprintf('RF Up-Conversion: ')</span>
+
+            <span class="comment">% Channel Identification</span>
+            <span class="comment">% Channels are defined on any channel number between 0 and 200,</span>
+            <span class="comment">% but set of valid operating channel numbers is regulated, and so</span>
+            <span class="comment">% channel choice is more limited.</span>
+            channel_number = 36;
+            fc = (5e3 + 5*channel_number)*1e6;
+
+            <span class="comment">% Establish a Time Domain</span>
+            <span class="comment">% We will use 100 samples per symbol</span>
+            T_sym = T_signal/(N_cp + 64);
+            symbol_time_domain = 0:T_sym/100:(T_sym-T_sym/100);
+
+            <span class="comment">% Up-Convert</span>
+            signal_tx_rf_real = zeros(length(symbol_time_domain)*(N_cp+64), 1);
+            signal_tx_rf_imag = zeros(length(symbol_time_domain)*(N_cp+64), 1);
+
+            <span class="keyword">for</span> symbol_ticker = 1:length(signal_tx_OFDM)
+                signal_tx_rf_real(1+(symbol_ticker-1)*length(symbol_time_domain):(symbol_ticker*length(symbol_time_domain))) = <span class="keyword">...</span>
+                    real(signal_tx_OFDM(symbol_ticker))*cos(2*pi*fc*symbol_time_domain);
+                signal_tx_rf_imag(1+(symbol_ticker-1)*length(symbol_time_domain):(symbol_ticker*length(symbol_time_domain))) = <span class="keyword">...</span>
+                    imag(signal_tx_OFDM(symbol_ticker))*sin(2*pi*fc*symbol_time_domain);
+            <span class="keyword">end</span>
+
+            signal_tx_rf = signal_tx_rf_real + signal_tx_rf_imag;
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="15">Channel</h2><p>A basic AWGN channel</p><pre class="codeinput">            <span class="comment">%fprintf('Channel Transmission: ')</span>
+
+            signal_channel = awgn(signal_tx_rf, currSNR, <span class="string">'measured'</span>);
+
+            <span class="comment">%fprintf('Complete!\n')</span>
+
+            <span class="comment">%fprintf('RECEIVER: \n\t')</span>
+</pre><h2 id="16">RF Down-Conversion</h2><p>We will use a coherent detector to separate quadrature &amp; in-phase components</p><pre class="codeinput">            <span class="comment">%fprintf('RF Down-Conversion: ')</span>
+
+            signal_rx_downconverted = zeros(size(signal_tx_OFDM));
+
+            <span class="keyword">for</span> symbol_ticker = 1:length(signal_tx_OFDM)
+                <span class="comment">% In-phase detector</span>
+                curr_symbol_in_real = signal_channel(1+(symbol_ticker-1)*length(symbol_time_domain):(symbol_ticker*length(symbol_time_domain))) <span class="keyword">...</span>
+                    .* cos(2*pi*fc*symbol_time_domain)';
+                curr_symbol_real = trapz(symbol_time_domain, curr_symbol_in_real) * 2/T_sym;
+
+                <span class="comment">% Quadrature detector</span>
+                curr_symbol_in_imag = signal_channel(1+(symbol_ticker-1)*length(symbol_time_domain):(symbol_ticker*length(symbol_time_domain))) <span class="keyword">...</span>
+                    .* sin(2*pi*fc*symbol_time_domain)';
+                curr_symbol_imag = trapz(symbol_time_domain, curr_symbol_in_imag) * 2/T_sym;
+
+                <span class="comment">% Combine</span>
+                signal_rx_downconverted(symbol_ticker) = curr_symbol_real + 1j*curr_symbol_imag;
+            <span class="keyword">end</span>
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="17">OFDM Demodulation (Cyclic Prefix + FFT)</h2><pre class="codeinput">            <span class="comment">%fprintf('OFDM Demodulation: ')</span>
+
+            <span class="comment">% Remove cyclic prefix</span>
+            signal_rx_noprefix = signal_rx_downconverted(N_cp+1:end);
+
+            <span class="comment">% Apply the FFT</span>
+            signal_rx_FFT_output = fft(signal_rx_noprefix);
+
+            <span class="comment">% Remove pilot subcarriers</span>
+            signal_rx_postOFDM = signal_rx_FFT_output([39:64, 2:27]);
+            signal_rx_data_only = signal_rx_postOFDM([1:5, 7:19, 21:26, 27:32, 34:46, 48:52]);
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="18">Baseband Demodulation</h2><pre class="codeinput">            <span class="comment">%fprintf('Baseband Demodulation: ')</span>
+
+            <span class="comment">% De-Normalize</span>
+            signal_rx_data_only = signal_rx_data_only / K_MOD;
+
+            <span class="comment">% Apply de-modulation scheme</span>
+            <span class="keyword">switch</span> Modulation
+                <span class="keyword">case</span> <span class="string">"BPSK"</span>
+                    signal_rx_demodulated = qamdemod(signal_rx_data_only, 2, <span class="string">'gray'</span>);
+                <span class="keyword">case</span> <span class="string">"QPSK"</span>
+                    signal_rx_symbols = qamdemod(signal_rx_data_only, 4, <span class="string">'gray'</span>);
+                    signal_rx_matrix = de2bi(signal_rx_symbols, log2(4));
+                    signal_rx_demodulated = signal_rx_matrix(:);
+                <span class="keyword">case</span> <span class="string">"16-QAM"</span>
+                    signal_rx_symbols = qamdemod(signal_rx_data_only, 16, <span class="string">'gray'</span>);
+                    signal_rx_matrix = de2bi(signal_rx_symbols, log2(16));
+                    signal_rx_demodulated = signal_rx_matrix(:);
+                <span class="keyword">case</span> <span class="string">"64-QAM"</span>
+                    signal_rx_symbols = qamdemod(signal_rx_data_only, 64, <span class="string">'gray'</span>);
+                    signal_rx_matrix = de2bi(signal_rx_symbols, log2(64));
+                    signal_rx_demodulated = signal_rx_matrix(:);
+            <span class="keyword">end</span>
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="19">De-Interleaving</h2><p>Source: IEEE 802.11a-1999 17.3.5.6</p><pre class="codeinput">            <span class="comment">%fprintf('De-Interleaving: ')</span>
+
+            <span class="comment">% General Block Deinterleaver, Permutations 1&amp;2</span>
+            signal_rx_deinterleaved_mid1 = zeros(size(signal_rx_demodulated));
+            signal_rx_deinterleaved_mid2 = zeros(size(signal_rx_demodulated));
+
+            s = max(N_bpsc/2, 1);
+            <span class="keyword">for</span> j = 0:N_cbps-1
+                i = s*floor(j/s) + mod(j + floor(16*j/N_cbps), s);
+                signal_rx_deinterleaved_mid1(i+1) = signal_rx_demodulated(j+1);
+            <span class="keyword">end</span>
+            <span class="keyword">for</span> i = 0:N_cbps-1
+                k = 16*i - ((N_cbps-1)*floor(16*i/N_cbps));
+                signal_rx_deinterleaved_mid2(k+1) = signal_rx_deinterleaved_mid1(i+1);
+            <span class="keyword">end</span>
+            clear <span class="string">i</span> <span class="string">j</span> <span class="string">k</span> <span class="string">s</span>
+
+            <span class="comment">% Matrix Deinterleaver</span>
+            signal_rx_deinterleaved = matdeintrlv(signal_rx_deinterleaved_mid2, N_cbps/16, 16);
+
+            <span class="comment">%fprintf('Complete!\n\t')</span>
+</pre><h2 id="20">Viterbi Decoder</h2><p>Source: IEEE 802.11a-1999 17.3.5.5</p><pre class="codeinput">            <span class="comment">%fprintf('Viterbi Decoding: ')</span>
+
+            <span class="comment">% Traceback Depth</span>
+            traceback_depth = 15;
+
+            <span class="comment">% Decode using Viterbi decoder</span>
+            <span class="comment">% Output should be of length N_dbps</span>
+            <span class="keyword">switch</span> R
+                <span class="keyword">case</span> 1/2
+                    signal_rx_decoded = vitdec(signal_rx_deinterleaved, trellis, traceback_depth, <span class="string">'trunc'</span>, <span class="string">'hard'</span>);
+                <span class="keyword">case</span> 3/4
+                    signal_rx_decoded = vitdec(signal_rx_deinterleaved, trellis, traceback_depth, <span class="string">'trunc'</span>, <span class="string">'hard'</span>, pPatternVec);
+                <span class="keyword">case</span> 2/3
+                    signal_rx_decoded = vitdec(signal_rx_deinterleaved, trellis, traceback_depth, <span class="string">'trunc'</span>, <span class="string">'hard'</span>, pPatternVec);
+            <span class="keyword">end</span>
+
+            <span class="comment">%fprintf('Complete!\n')</span>
+</pre><h2 id="21">Bit Error Rate</h2><pre class="codeinput">            BER(Data_Rate_ticker, SNR_ticker) = BER(Data_Rate_ticker, SNR_ticker) + <span class="keyword">...</span>
+                sum(signal_original_bi ~= signal_rx_decoded)/N_dbps;
+</pre><pre class="codeinput">        <span class="keyword">end</span>
+</pre><pre class="codeinput">    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+BER = BER / numTrials;
+</pre><h2 id="25">Plot BER Curves</h2><pre class="codeinput">figure(<span class="string">'Name'</span>, <span class="string">'BER Curves'</span>)
+subplot(1,2,1)
+<span class="keyword">for</span> plot_ticker = 1:8
+    plot(SNR, BER(plot_ticker, :), <span class="string">'-s'</span>, <span class="string">'LineWidth'</span>, 2)
+    hold <span class="string">on</span>
+<span class="keyword">end</span>
+ylim([1e-4, 1e0])
+legend(<span class="string">'6 Mbps'</span>, <span class="string">'9 Mbps'</span>, <span class="string">'12 Mbps'</span>, <span class="string">'18 Mbps'</span>, <span class="string">'24 Mbps'</span>, <span class="string">'36 Mbps'</span>, <span class="string">'48 Mbps'</span>, <span class="string">'54 Mbps'</span>)
+title(<span class="string">'802.11a Experimental BER Curves, Linear Scale'</span>)
+xlabel(<span class="string">'SNR (dB)'</span>)
+xlim([-10 10])
+ylabel(<span class="string">'BER'</span>)
+grid <span class="string">on</span>
+
+subplot(1,2,2)
+<span class="keyword">for</span> plot_ticker = 1:8
+    semilogy(SNR, BER(plot_ticker, :), <span class="string">'-s'</span>, <span class="string">'LineWidth'</span>, 2)
+    hold <span class="string">on</span>
+<span class="keyword">end</span>
+ylim([1e-4, 1e0])
+legend(<span class="string">'6 Mbps'</span>, <span class="string">'9 Mbps'</span>, <span class="string">'12 Mbps'</span>, <span class="string">'18 Mbps'</span>, <span class="string">'24 Mbps'</span>, <span class="string">'36 Mbps'</span>, <span class="string">'48 Mbps'</span>, <span class="string">'54 Mbps'</span>)
+title(<span class="string">'802.11a Experimental BER Curves, Logarithmic Scale'</span>)
+xlabel(<span class="string">'SNR (dB)'</span>)
+xlim([-10 10])
+ylabel(<span class="string">'BER'</span>)
+grid <span class="string">on</span>
+</pre><img vspace="5" hspace="5" src="IEEE_802_11a_Simulation_ASLevin_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% IEEE 802.11a Simulation
+% Alon S. Levin
+% ECE-408 Wireless Communications
+% Spring 2020
+
+%% Prepare Environment
+clear, clc, close all       % Clear all current variables and outputs
+format compact              % Prepare command line output
+profile on                  % Allow for timing information
+%rng default                 % Control pRNG to provide same results each time
+
+BER = zeros(8, 20);         % Prepare BER matrix
+
+%% Timing related Parameters
+% Source: IEEE 802.11a-1999 17.3.2.3, Table 79
+
+% Variables
+%   N_sd        - Number of data subcarriers
+%   N_sp        - Number of pilot subcarriers
+%   delta_f     - Subcarrier frequency spacing [Hz]
+%   T_fft       - IFFT/FFT period [sec]
+%   T_gi        - GI/CP duration [sec]
+%   T_signal    - Duration of the signal BPSK-OFDM signal [sec]
+%   N_cp        - Number of data points in cyclic prefix
+
+N_sd     = 48;
+N_sp     = 4;
+delta_f  = 0.3125e6;
+T_fft    = 1/delta_f;
+T_gi     = 0.8e-6;
+T_signal = T_gi + T_fft;
+
+%% Number of Trials
+numTrials = 20;
+
+for trial_ticker = 1:numTrials
+    %fprintf('=== BEGINNING TRIAL %i === \n', trial_ticker)
+    
+    %% RATE-Dependent Parameters
+    % Source: IEEE 802.11a-1999 17.3.2.2, Table 78
+
+    % Desired data rate [Mbits/s]
+    %   One of {6, 9, 12, 18, 24, 36, 48, 54}
+    Data_Rate_all = [6, 9, 12, 18, 24, 36, 48, 54];
+
+    for Data_Rate_ticker = 1:length(Data_Rate_all)
+        Data_Rate = Data_Rate_all(Data_Rate_ticker);
+
+        % Other Parameters
+        %   Modulation  - Modulation scheme
+        %   R           - Coding rate
+        %   N_bpsc      - Coded bits per subcarrier
+        %   N_cbps      - Coded bits per OFDM symbol
+        %   N_dbps      - Data bits per OFDM symbol
+        switch Data_Rate
+            case 6
+                Modulation  = "BPSK";
+                R           = 1/2;
+                N_bpsc      = 1;
+                N_cbps      = 48;
+                N_dbps      = 24;
+            case 9
+                Modulation  = "BPSK";
+                R           = 3/4;
+                N_bpsc      = 1;
+                N_cbps      = 48;
+                N_dbps      = 36;
+            case 12
+                Modulation  = "QPSK";
+                R           = 1/2;
+                N_bpsc      = 2;
+                N_cbps      = 96;
+                N_dbps      = 48;
+            case 18
+                Modulation  = "QPSK";
+                R           = 3/4;
+                N_bpsc      = 2;
+                N_cbps      = 96;
+                N_dbps      = 72;
+            case 24
+                Modulation  = "16-QAM";
+                R           = 1/2;
+                N_bpsc      = 4;
+                N_cbps      = 192;
+                N_dbps      = 96;
+            case 36
+                Modulation  = "16-QAM";
+                R           = 3/4;
+                N_bpsc      = 4;
+                N_cbps      = 192;
+                N_dbps      = 144;
+            case 48
+                Modulation  = "64-QAM";
+                R           = 2/3;
+                N_bpsc      = 6;
+                N_cbps      = 288;
+                N_dbps      = 192;
+            case 54
+                Modulation  = "64-QAM";
+                R           = 3/4;
+                N_bpsc      = 6;
+                N_cbps      = 288;
+                N_dbps      = 216;
+        end
+        
+        %% SNR Values
+        % We will use additive white Gaussian noise to model the channel
+        SNR = linspace(-10, 9, 20);
+
+        for SNR_ticker = 1:length(SNR)
+            currSNR = SNR(SNR_ticker);
+
+
+            %fprintf('== Data Rate %i Mbps ==\n', Data_Rate)
+            %fprintf('= SNR %i dB =\n', currSNR)
+            
+            %fprintf('TRANSMITTER: \n\t')
+            %% Random Signal Generation
+            % Generate a binary stream of length N_dbps.
+            %fprintf('Signal Generation: ')
+            
+            signal_original_bi = randi([0,1], N_dbps, 1);
+            
+            %fprintf('Complete!\n\t')
+            
+            %% Convolutional Encoding
+            % Source: IEEE 802.11a-1999 17.3.5.5
+
+            %fprintf('Convolutional Encoding: ')
+            
+            % Industry-standard generator polynomials, in octal
+            g0 = 133;
+            g1 = 171;
+            k  = 7;
+            trellis = poly2trellis(k, [g0, g1]);
+
+            % Create and apply encoders
+            % Output should be of length N_cbps
+            switch R
+                case 1/2
+                    signal_tx_encoded = convenc(signal_original_bi, trellis);
+                case 3/4
+                    pPatternMat = [1 1 0 1 1 0 1 1 0; ...
+                                   1 0 1 1 0 1 1 0 1];
+                    pPatternVec = reshape(pPatternMat, 18, 1);
+                    signal_tx_encoded = convenc(signal_original_bi, trellis, pPatternVec);
+
+                case 2/3
+                    pPatternMat = [1 1 1 1 1 1; ...
+                                   1 0 1 0 1 0];
+                    pPatternVec = reshape(pPatternMat, 12, 1);
+                    signal_tx_encoded = convenc(signal_original_bi, trellis, pPatternVec);
+            end
+
+            %fprintf('Complete!\n\t')
+            
+            %% Interleaving
+            % Source: IEEE 802.11a-1999 17.3.5.6
+
+            %fprintf('Interleaving: ')
+            
+            % Matrix Interleaver
+            signal_tx_interleaved_mat = matintrlv(signal_tx_encoded, N_cbps/16, 16);
+
+            % General Block Interleaver, Permutations 1&2
+            signal_tx_interleaved_mid = zeros(size(signal_tx_interleaved_mat));
+            signal_tx_interleaved = zeros(size(signal_tx_interleaved_mid));
+
+            for k = 0:N_cbps-1
+                i = (N_cbps/16)*mod(k, 16) + floor(k/16);
+                signal_tx_interleaved_mid(i+1) = signal_tx_interleaved_mat(k+1);
+            end
+            s = max(N_bpsc/2, 1);
+            for i = 0:N_cbps-1
+                j = s*floor(i/s) + mod(i+N_cbps-floor(16*i/N_cbps), s);
+                signal_tx_interleaved(j+1) = signal_tx_interleaved_mid(i+1);
+            end
+            clear i j k s
+
+            %fprintf('Complete!\n\t')
+            
+            %% Baseband Modulation
+            % Source: IEEE 802.11a-1999 17.3.5.7-8
+
+            %fprintf('Baseband Modulation: ')
+            
+            % Apply modulation scheme
+            switch Modulation
+                case "BPSK"
+                    signal_tx_modulated = qammod(signal_tx_interleaved, 2, 'gray');
+                case "QPSK"
+                    signal_tx_symbols = bi2de(reshape(signal_tx_interleaved, length(signal_tx_interleaved)/log2(4), log2(4)));
+                    signal_tx_modulated = qammod(signal_tx_symbols, 4, 'gray');
+                case "16-QAM"
+                    signal_tx_symbols = bi2de(reshape(signal_tx_interleaved, length(signal_tx_interleaved)/log2(16), log2(16)));
+                    signal_tx_modulated = qammod(signal_tx_symbols, 16, 'gray');
+                case "64-QAM"
+                    signal_tx_symbols = bi2de(reshape(signal_tx_interleaved, length(signal_tx_interleaved)/log2(64), log2(64)));
+                    signal_tx_modulated = qammod(signal_tx_symbols, 64, 'gray');
+            end
+
+            % Generate random BPSK-modulated pilot subcarriers
+            pilot_symbols_modulated = 2*randi([0,1], 4, 1) - 1;
+
+            % Normalize 
+            switch Modulation
+                case "BPSK"
+                    K_MOD = 1;
+                case "QPSK"
+                    K_MOD = 1/sqrt(2);
+                case "16-QAM"
+                    K_MOD = 1/sqrt(10);
+                case "64-QAM"
+                    K_MOD = 1/sqrt(42);
+            end
+            signal_tx_modulated = K_MOD * signal_tx_modulated;
+            pilot_symbols_modulated = K_MOD * pilot_symbols_modulated;
+
+            %fprintf('Complete!\n\t')
+            
+            %% OFDM Modulation (IFFT + Cyclic Prefix)
+            % Source: IEEE 802.11a-1999 17.3.5.9
+
+            %fprintf('OFDM Modulation: ')
+            
+            % Combine data symbols and pilot symbols
+            combined_signal = [signal_tx_modulated(1:5); ...    % -26 REPLACE_WITH_DASH_DASH> -22
+                               pilot_symbols_modulated(1); ...  % -21
+                               signal_tx_modulated(6:18); ...   % -20 REPLACE_WITH_DASH_DASH> -08
+                               pilot_symbols_modulated(2); ...  % -07
+                               signal_tx_modulated(19:24); ...  % -06 REPLACE_WITH_DASH_DASH> -01
+                               signal_tx_modulated(25:30); ...  %  01 REPLACE_WITH_DASH_DASH>  06
+                               pilot_symbols_modulated(3); ...  %  07
+                               signal_tx_modulated(31:43); ...  %  08 REPLACE_WITH_DASH_DASH>  20
+                               pilot_symbols_modulated(4); ...  %  21
+                               signal_tx_modulated(44:48)];     %  22 REPLACE_WITH_DASH_DASH>  26
+
+            % Apply the IFFT
+            IFFT_input = [zeros(1,1); ...               % Port  0    : Null
+                          combined_signal(27:52); ...   % Ports 1-26 : 1   > 26
+                          zeros(11, 1); ...             % Ports 27-37: Null
+                          combined_signal(1:26)];       % Ports 38-63: -26 > -1          
+
+            IFFT_output = ifft(IFFT_input);
+
+            % Add the Cyclic Prefix
+            % The cyclic prefix fits into the guard time T_gi, so the number of
+            % samples in it should be a ratio of T_gi to T_fft times the number
+            % of FFT samples
+            N_cp = (T_gi/T_fft) * 64;
+            signal_tx_OFDM = [IFFT_output(64-N_cp+1:64); ...
+                              IFFT_output];
+
+            %fprintf('Complete!\n\t')
+            
+            %% RF Up-Conversion
+            % Source: IEEE 802.11a-1999 17.3.8.3
+
+            %fprintf('RF Up-Conversion: ')
+            
+            % Channel Identification
+            % Channels are defined on any channel number between 0 and 200,
+            % but set of valid operating channel numbers is regulated, and so
+            % channel choice is more limited.
+            channel_number = 36;
+            fc = (5e3 + 5*channel_number)*1e6;
+
+            % Establish a Time Domain
+            % We will use 100 samples per symbol
+            T_sym = T_signal/(N_cp + 64);
+            symbol_time_domain = 0:T_sym/100:(T_sym-T_sym/100);
+
+            % Up-Convert
+            signal_tx_rf_real = zeros(length(symbol_time_domain)*(N_cp+64), 1);
+            signal_tx_rf_imag = zeros(length(symbol_time_domain)*(N_cp+64), 1);
+
+            for symbol_ticker = 1:length(signal_tx_OFDM)
+                signal_tx_rf_real(1+(symbol_ticker-1)*length(symbol_time_domain):(symbol_ticker*length(symbol_time_domain))) = ...
+                    real(signal_tx_OFDM(symbol_ticker))*cos(2*pi*fc*symbol_time_domain);
+                signal_tx_rf_imag(1+(symbol_ticker-1)*length(symbol_time_domain):(symbol_ticker*length(symbol_time_domain))) = ...
+                    imag(signal_tx_OFDM(symbol_ticker))*sin(2*pi*fc*symbol_time_domain);
+            end
+
+            signal_tx_rf = signal_tx_rf_real + signal_tx_rf_imag;
+
+            %fprintf('Complete!\n\t')
+            
+            %% Channel
+            % A basic AWGN channel
+            
+            %fprintf('Channel Transmission: ')
+            
+            signal_channel = awgn(signal_tx_rf, currSNR, 'measured');
+
+            %fprintf('Complete!\n')
+            
+            %fprintf('RECEIVER: \n\t')
+            
+            %% RF Down-Conversion
+            % We will use a coherent detector to separate quadrature & in-phase
+            % components
+
+            %fprintf('RF Down-Conversion: ')
+            
+            signal_rx_downconverted = zeros(size(signal_tx_OFDM));
+
+            for symbol_ticker = 1:length(signal_tx_OFDM)
+                % In-phase detector
+                curr_symbol_in_real = signal_channel(1+(symbol_ticker-1)*length(symbol_time_domain):(symbol_ticker*length(symbol_time_domain))) ...
+                    .* cos(2*pi*fc*symbol_time_domain)';
+                curr_symbol_real = trapz(symbol_time_domain, curr_symbol_in_real) * 2/T_sym;
+
+                % Quadrature detector
+                curr_symbol_in_imag = signal_channel(1+(symbol_ticker-1)*length(symbol_time_domain):(symbol_ticker*length(symbol_time_domain))) ...
+                    .* sin(2*pi*fc*symbol_time_domain)';
+                curr_symbol_imag = trapz(symbol_time_domain, curr_symbol_in_imag) * 2/T_sym;
+
+                % Combine
+                signal_rx_downconverted(symbol_ticker) = curr_symbol_real + 1j*curr_symbol_imag;
+            end
+
+            %fprintf('Complete!\n\t')
+
+            %% OFDM Demodulation (Cyclic Prefix + FFT) 
+
+            %fprintf('OFDM Demodulation: ')
+            
+            % Remove cyclic prefix
+            signal_rx_noprefix = signal_rx_downconverted(N_cp+1:end);
+
+            % Apply the FFT
+            signal_rx_FFT_output = fft(signal_rx_noprefix);
+
+            % Remove pilot subcarriers
+            signal_rx_postOFDM = signal_rx_FFT_output([39:64, 2:27]);
+            signal_rx_data_only = signal_rx_postOFDM([1:5, 7:19, 21:26, 27:32, 34:46, 48:52]);
+
+            %fprintf('Complete!\n\t')
+
+            %% Baseband Demodulation
+
+            %fprintf('Baseband Demodulation: ')
+            
+            % De-Normalize
+            signal_rx_data_only = signal_rx_data_only / K_MOD;
+
+            % Apply de-modulation scheme
+            switch Modulation
+                case "BPSK"
+                    signal_rx_demodulated = qamdemod(signal_rx_data_only, 2, 'gray');
+                case "QPSK"
+                    signal_rx_symbols = qamdemod(signal_rx_data_only, 4, 'gray');
+                    signal_rx_matrix = de2bi(signal_rx_symbols, log2(4));
+                    signal_rx_demodulated = signal_rx_matrix(:);
+                case "16-QAM"
+                    signal_rx_symbols = qamdemod(signal_rx_data_only, 16, 'gray');
+                    signal_rx_matrix = de2bi(signal_rx_symbols, log2(16));
+                    signal_rx_demodulated = signal_rx_matrix(:);
+                case "64-QAM"
+                    signal_rx_symbols = qamdemod(signal_rx_data_only, 64, 'gray');
+                    signal_rx_matrix = de2bi(signal_rx_symbols, log2(64));
+                    signal_rx_demodulated = signal_rx_matrix(:);
+            end
+
+            %fprintf('Complete!\n\t')
+
+            %% De-Interleaving
+            % Source: IEEE 802.11a-1999 17.3.5.6
+
+            %fprintf('De-Interleaving: ')
+            
+            % General Block Deinterleaver, Permutations 1&2
+            signal_rx_deinterleaved_mid1 = zeros(size(signal_rx_demodulated));
+            signal_rx_deinterleaved_mid2 = zeros(size(signal_rx_demodulated));
+
+            s = max(N_bpsc/2, 1);
+            for j = 0:N_cbps-1
+                i = s*floor(j/s) + mod(j + floor(16*j/N_cbps), s);
+                signal_rx_deinterleaved_mid1(i+1) = signal_rx_demodulated(j+1);
+            end
+            for i = 0:N_cbps-1
+                k = 16*i - ((N_cbps-1)*floor(16*i/N_cbps));
+                signal_rx_deinterleaved_mid2(k+1) = signal_rx_deinterleaved_mid1(i+1);
+            end
+            clear i j k s
+
+            % Matrix Deinterleaver
+            signal_rx_deinterleaved = matdeintrlv(signal_rx_deinterleaved_mid2, N_cbps/16, 16);
+
+            %fprintf('Complete!\n\t')
+
+            %% Viterbi Decoder
+            % Source: IEEE 802.11a-1999 17.3.5.5
+
+            %fprintf('Viterbi Decoding: ')
+            
+            % Traceback Depth
+            traceback_depth = 15;
+
+            % Decode using Viterbi decoder
+            % Output should be of length N_dbps
+            switch R
+                case 1/2
+                    signal_rx_decoded = vitdec(signal_rx_deinterleaved, trellis, traceback_depth, 'trunc', 'hard');
+                case 3/4
+                    signal_rx_decoded = vitdec(signal_rx_deinterleaved, trellis, traceback_depth, 'trunc', 'hard', pPatternVec);
+                case 2/3
+                    signal_rx_decoded = vitdec(signal_rx_deinterleaved, trellis, traceback_depth, 'trunc', 'hard', pPatternVec);
+            end
+
+            %fprintf('Complete!\n')
+
+            %% Bit Error Rate
+            BER(Data_Rate_ticker, SNR_ticker) = BER(Data_Rate_ticker, SNR_ticker) + ...
+                sum(signal_original_bi ~= signal_rx_decoded)/N_dbps;
+
+        end
+    end
+end
+BER = BER / numTrials;
+
+%% Plot BER Curves
+
+figure('Name', 'BER Curves')
+subplot(1,2,1)
+for plot_ticker = 1:8
+    plot(SNR, BER(plot_ticker, :), '-s', 'LineWidth', 2)
+    hold on
+end
+ylim([1e-4, 1e0])
+legend('6 Mbps', '9 Mbps', '12 Mbps', '18 Mbps', '24 Mbps', '36 Mbps', '48 Mbps', '54 Mbps')
+title('802.11a Experimental BER Curves, Linear Scale')
+xlabel('SNR (dB)')
+xlim([-10 10])
+ylabel('BER')
+grid on
+
+subplot(1,2,2)
+for plot_ticker = 1:8
+    semilogy(SNR, BER(plot_ticker, :), '-s', 'LineWidth', 2)
+    hold on
+end
+ylim([1e-4, 1e0])
+legend('6 Mbps', '9 Mbps', '12 Mbps', '18 Mbps', '24 Mbps', '36 Mbps', '48 Mbps', '54 Mbps')
+title('802.11a Experimental BER Curves, Logarithmic Scale')
+xlabel('SNR (dB)')
+xlim([-10 10])
+ylabel('BER')
+grid on
+##### SOURCE END #####
+--></body></html>
