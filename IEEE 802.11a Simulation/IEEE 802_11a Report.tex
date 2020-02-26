@@ -74,13 +74,15 @@ This orthogonality principle lends to simple hardware translation as, fundamenta
     \label{fig:IFFT}
 \end{figure}
 
-Once in the time-domain, a cyclic prefix is prepended to the frame, consisting of the last sixteen time-domain samples out of the outputted sixty-four. This is easily apparent as, per Fig.~\ref{fig:time_params}, the required guard time $\text{T}_\text{GI}$ (which determines the time-frame that the cyclic prefix occupies) is a quarter of the IFFT/FFT period $\text{T}_\text{FFT}$. Therefore, the entire transmitted frame consists of a total of eighty time-domain samples.
+Once in the time-domain, a cyclic prefix is prepended to the frame, consisting of the last sixteen time-domain samples out of the outputted sixty-four. This is easily apparent as, per Fig.~\ref{fig:time_params}, the required guard time $\text{T}_\text{GI}$ (which determines the time-frame that the cyclic prefix occupies) is a quarter of the IFFT/FFT period $\text{T}_\text{FFT}$. Therefore, the entire transmitted frame consists of a total of eighty time-domain samples (see Fig.~\ref{fig:Frame}).
 \begin{figure}
     \centering
     \includegraphics[width = 0.45\textwidth]{Frame}
-    \caption{A single transmission frame, with guard time $\text{T}_\text{GI}$ and useful symbol time $\text{T}_\text{FFT}$ labeled.}
+    \caption{A single time-domain transmission frame, with guard time $\text{T}_\text{GI}$ and useful symbol time $\text{T}_\text{FFT}$ labeled.}
     \label{fig:Frame}
 \end{figure}
+
+At this stage, the signal is heterodyned for RF transmission across the channel, where it is received by the receiver, heterodyned back down to baseband, and OFDM demodulation takes place.
 
 %%%%%%%%%%%%%%%%%%% Sections %%%%%%%%%%%%%%%%%%%
 %\section{•} \label{sec:•}
