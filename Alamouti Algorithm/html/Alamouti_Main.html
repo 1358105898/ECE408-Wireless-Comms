@@ -1,0 +1,209 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Alamouti Algorithm Implementation</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-03-16"><meta name="DC.source" content="Alamouti_Main.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Alamouti Algorithm Implementation</h1><!--introduction--><p>Alon S. Levin ECE-408 Wireless Communications Spring 2020</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare Environment</a></li><li><a href="#2">Prepare to Gather Simulation Results</a></li><li><a href="#3">Begin Simulation</a></li><li><a href="#4">No Diversity</a></li><li><a href="#5">MRRC, 2 Rx</a></li><li><a href="#6">MRRC, 4 Rx</a></li><li><a href="#7">Alamouti, 1 Rx</a></li><li><a href="#8">Alamouti, 2 Rx</a></li><li><a href="#9">Plot the Result</a></li></ul></div><h2 id="1">Prepare Environment</h2><pre class="codeinput">clear, clc, close <span class="string">all</span>       <span class="comment">% Clear all current variables and outputs</span>
+format <span class="string">compact</span>              <span class="comment">% Prepare command line output</span>
+profile <span class="string">on</span>                  <span class="comment">% Allow for timing information</span>
+</pre><h2 id="2">Prepare to Gather Simulation Results</h2><pre class="codeinput">numSNR = 16;                    <span class="comment">% Number of SNR points we want to test</span>
+SNR = linspace(0, 50, numSNR);  <span class="comment">% SNR we want to test</span>
+BER = nan(5, numSNR);           <span class="comment">% Empty BER matrix, to be filled</span>
+
+numBits = 1e4;                  <span class="comment">% Number of data bits to transmit</span>
+numIter = 100;                  <span class="comment">% Number of iterations of algorithms</span>
+
+f_m     = 1;                    <span class="comment">% Maximum Doppler frequency shift</span>
+</pre><h2 id="3">Begin Simulation</h2><h2 id="4">No Diversity</h2><p>numRx = 1</p><pre class="codeinput">fprintf(<span class="string">'Begin:\tNo diversity\n'</span>)
+tic
+BER(1, :) = estimateBER_MRRC(1, numBits, SNR, numIter, f_m);
+fprintf(<span class="string">'End:\tNo diversity\n'</span>)
+toc
+</pre><pre class="codeoutput">Begin:	No diversity
+End:	No diversity
+Elapsed time is 3.434695 seconds.
+</pre><h2 id="5">MRRC, 2 Rx</h2><pre class="codeinput">fprintf(<span class="string">'Begin:\tMRRC, 2 Rx\n'</span>)
+tic
+BER(2, :) = estimateBER_MRRC(2, numBits, SNR, numIter, f_m);
+fprintf(<span class="string">'End:\tMRRC, 2 Rx\n'</span>)
+toc
+</pre><pre class="codeoutput">Begin:	MRRC, 2 Rx
+End:	MRRC, 2 Rx
+Elapsed time is 5.492659 seconds.
+</pre><h2 id="6">MRRC, 4 Rx</h2><pre class="codeinput">fprintf(<span class="string">'Begin:\tMRRC, 4 Rx\n'</span>)
+tic
+BER(3, :) = estimateBER_MRRC(4, numBits, SNR, numIter, f_m);
+fprintf(<span class="string">'End:\tMRRC, 4 Rx\n'</span>)
+toc
+</pre><pre class="codeoutput">Begin:	MRRC, 4 Rx
+End:	MRRC, 4 Rx
+Elapsed time is 10.851407 seconds.
+</pre><h2 id="7">Alamouti, 1 Rx</h2><pre class="codeinput">fprintf(<span class="string">'Begin:\tAlamouti, 1 Rx\n'</span>)
+tic
+BER(4, :) = estimateBER_Alamouti(1, numBits, SNR, numIter, f_m);
+fprintf(<span class="string">'End:\tAlamouti, 1 Rx\n'</span>)
+toc
+</pre><pre class="codeoutput">Begin:	Alamouti, 1 Rx
+End:	Alamouti, 1 Rx
+Elapsed time is 4.330688 seconds.
+</pre><h2 id="8">Alamouti, 2 Rx</h2><pre class="codeinput">fprintf(<span class="string">'Begin:\tAlamouti, 2 Rx\n'</span>)
+tic
+BER(5, :) = estimateBER_Alamouti(2, numBits, SNR, numIter, f_m);
+fprintf(<span class="string">'End:\tAlamouti, 2 Rx\n'</span>)
+toc
+</pre><pre class="codeoutput">Begin:	Alamouti, 2 Rx
+End:	Alamouti, 2 Rx
+Elapsed time is 7.737751 seconds.
+</pre><h2 id="9">Plot the Result</h2><pre class="codeinput">figure(<span class="string">'Name'</span>, <span class="string">'BER Performance Comparison'</span>)
+semilogy(SNR, BER(1,:), <span class="string">'-o'</span>, <span class="string">'LineWidth'</span>, 2, <span class="string">'MarkerFaceColor'</span>, <span class="string">'auto'</span>, <span class="string">'MarkerEdgeColor'</span>, <span class="string">'k'</span>, <span class="string">'MarkerSize'</span>, 8)
+hold <span class="string">on</span>
+semilogy(SNR, BER(2,:), <span class="string">'-v'</span>, <span class="string">'LineWidth'</span>, 2, <span class="string">'MarkerFaceColor'</span>, <span class="string">'auto'</span>, <span class="string">'MarkerEdgeColor'</span>, <span class="string">'k'</span>, <span class="string">'MarkerSize'</span>, 8)
+semilogy(SNR, BER(3,:), <span class="string">'-s'</span>, <span class="string">'LineWidth'</span>, 2, <span class="string">'MarkerFaceColor'</span>, <span class="string">'auto'</span>, <span class="string">'MarkerEdgeColor'</span>, <span class="string">'k'</span>, <span class="string">'MarkerSize'</span>, 8)
+semilogy(SNR, BER(4,:), <span class="string">'-d'</span>, <span class="string">'LineWidth'</span>, 2, <span class="string">'MarkerFaceColor'</span>, <span class="string">'auto'</span>, <span class="string">'MarkerEdgeColor'</span>, <span class="string">'k'</span>, <span class="string">'MarkerSize'</span>, 8)
+semilogy(SNR, BER(5,:), <span class="string">'-^'</span>, <span class="string">'LineWidth'</span>, 2, <span class="string">'MarkerFaceColor'</span>, <span class="string">'auto'</span>, <span class="string">'MarkerEdgeColor'</span>, <span class="string">'k'</span>, <span class="string">'MarkerSize'</span>, 8)
+title(<span class="string">'BER Performance Comparison'</span>)
+xlabel(<span class="string">'SNR (dB)'</span>)
+ylabel(<span class="string">'Bit Error Rate (BER)'</span>)
+xlim([0, 50])
+ylim([1e-6, 1e0])
+grid <span class="string">on</span>
+legend(<span class="string">'No Diversity (1 Tx, 1 Rx)'</span>, <span class="string">'MRRC (1 Tx, 2 Rx)'</span>, <span class="string">'MRRC (1 Tx, 4 Rx)'</span>, <span class="string">'New Scheme (2 Tx, 1 Rx)'</span>, <span class="string">'New Scheme (2 Tx, 2 Rx)'</span>)
+</pre><img vspace="5" hspace="5" src="Alamouti_Main_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Alamouti Algorithm Implementation
+% Alon S. Levin
+% ECE-408 Wireless Communications
+% Spring 2020
+
+%% Prepare Environment
+clear, clc, close all       % Clear all current variables and outputs
+format compact              % Prepare command line output
+profile on                  % Allow for timing information
+
+%% Prepare to Gather Simulation Results
+numSNR = 16;                    % Number of SNR points we want to test
+SNR = linspace(0, 50, numSNR);  % SNR we want to test
+BER = nan(5, numSNR);           % Empty BER matrix, to be filled
+
+numBits = 1e4;                  % Number of data bits to transmit
+numIter = 100;                  % Number of iterations of algorithms
+
+f_m     = 1;                    % Maximum Doppler frequency shift
+
+%% Begin Simulation
+%% No Diversity
+% numRx = 1
+fprintf('Begin:\tNo diversity\n')
+tic
+BER(1, :) = estimateBER_MRRC(1, numBits, SNR, numIter, f_m);
+fprintf('End:\tNo diversity\n')
+toc
+
+%% MRRC, 2 Rx
+fprintf('Begin:\tMRRC, 2 Rx\n')
+tic
+BER(2, :) = estimateBER_MRRC(2, numBits, SNR, numIter, f_m);
+fprintf('End:\tMRRC, 2 Rx\n')
+toc
+
+%% MRRC, 4 Rx
+fprintf('Begin:\tMRRC, 4 Rx\n')
+tic
+BER(3, :) = estimateBER_MRRC(4, numBits, SNR, numIter, f_m);
+fprintf('End:\tMRRC, 4 Rx\n')
+toc
+
+%% Alamouti, 1 Rx
+fprintf('Begin:\tAlamouti, 1 Rx\n')
+tic
+BER(4, :) = estimateBER_Alamouti(1, numBits, SNR, numIter, f_m);
+fprintf('End:\tAlamouti, 1 Rx\n')
+toc
+
+%% Alamouti, 2 Rx
+fprintf('Begin:\tAlamouti, 2 Rx\n')
+tic
+BER(5, :) = estimateBER_Alamouti(2, numBits, SNR, numIter, f_m);
+fprintf('End:\tAlamouti, 2 Rx\n')
+toc
+
+%% Plot the Result
+figure('Name', 'BER Performance Comparison')
+semilogy(SNR, BER(1,:), '-o', 'LineWidth', 2, 'MarkerFaceColor', 'auto', 'MarkerEdgeColor', 'k', 'MarkerSize', 8)
+hold on
+semilogy(SNR, BER(2,:), '-v', 'LineWidth', 2, 'MarkerFaceColor', 'auto', 'MarkerEdgeColor', 'k', 'MarkerSize', 8)
+semilogy(SNR, BER(3,:), '-s', 'LineWidth', 2, 'MarkerFaceColor', 'auto', 'MarkerEdgeColor', 'k', 'MarkerSize', 8)
+semilogy(SNR, BER(4,:), '-d', 'LineWidth', 2, 'MarkerFaceColor', 'auto', 'MarkerEdgeColor', 'k', 'MarkerSize', 8)
+semilogy(SNR, BER(5,:), '-^', 'LineWidth', 2, 'MarkerFaceColor', 'auto', 'MarkerEdgeColor', 'k', 'MarkerSize', 8)
+title('BER Performance Comparison')
+xlabel('SNR (dB)')
+ylabel('Bit Error Rate (BER)')
+xlim([0, 50])
+ylim([1e-6, 1e0])
+grid on
+legend('No Diversity (1 Tx, 1 Rx)', 'MRRC (1 Tx, 2 Rx)', 'MRRC (1 Tx, 4 Rx)', 'New Scheme (2 Tx, 1 Rx)', 'New Scheme (2 Tx, 2 Rx)')
+##### SOURCE END #####
+--></body></html>
