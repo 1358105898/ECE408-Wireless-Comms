@@ -53,8 +53,7 @@ sum_terms = sum(ifft_out.^2, 2);
 %%
 % (7) Take the square root of the sum to obtain an N-point time series of a
 % simulated Rayleigh fading signal with the proper Doppler spread and time
-% correlation (and then normalized)
+% correlation.
 chan = sqrt(sum_terms);
-%chan = chan / mean(chan);
 end
 

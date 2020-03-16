@@ -36,7 +36,7 @@ for iter_ticker = 1:numIter
         for Rx_ticker = 1:numRx
             data_rx(:, Rx_ticker) = ...
                 awgn(sum(data_tx .* chans(:, Rx_ticker:Rx_ticker+1), 2), ...
-                     currSNR-3, 'measured');
+                     currSNR, 'measured');
         end
         
         % Split incoming stream into r0 and r1 vectors

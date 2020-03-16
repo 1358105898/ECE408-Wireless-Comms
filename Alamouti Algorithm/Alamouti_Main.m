@@ -14,7 +14,7 @@ SNR = linspace(0, 50, numSNR);  % SNR we want to test
 BER = nan(5, numSNR);           % Empty BER matrix, to be filled
 
 numBits = 1e4;                  % Number of data bits to transmit
-numIter = 50;                   % Number of iterations of algorithms
+numIter = 100;                  % Number of iterations of algorithms
 
 f_m     = 1;                    % Maximum Doppler frequency shift
 
