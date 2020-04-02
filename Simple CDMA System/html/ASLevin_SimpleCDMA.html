@@ -1,0 +1,425 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Simple CDMA System</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-02"><meta name="DC.source" content="ASLevin_SimpleCDMA.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Simple CDMA System</h1><!--introduction--><p>Alon S. Levin ECE-408: Wireless Communications Spring 2020</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare Environment</a></li><li><a href="#2">Simulation Parameters</a></li><li><a href="#3">Load Received Signal</a></li><li><a href="#4">Filter &amp; Downsample Received Signal</a></li><li><a href="#5">Generate an M-Sequence</a></li><li><a href="#6">Find Cross-Correlation Between Received Signal &amp; M-Sequence</a></li><li><a href="#7">Obtain Pilots</a></li><li><a href="#8">Obtain Phase &amp; Frequency Offsets</a></li><li><a href="#9">Undo the Shifting</a></li><li><a href="#10">Generate Pilots, Remove from Data</a></li><li><a href="#11">Determine valid characters</a></li><li><a href="#12">Despread</a></li></ul></div><h2 id="1">Prepare Environment</h2><pre class="codeinput">clear, clc, close <span class="string">all</span>       <span class="comment">% Clear all current variables and outputs</span>
+format <span class="string">compact</span>              <span class="comment">% Prepare command line output</span>
+</pre><h2 id="2">Simulation Parameters</h2><pre class="codeinput">chip_rate = 1e6;            <span class="comment">% Chip Rate [Hz]</span>
+oversample_rate = 4;        <span class="comment">% Oversample rate</span>
+RRC_filt_rolloff = 0.75;    <span class="comment">% RRC Filter Rolloff</span>
+
+chips_per_frame = 255;      <span class="comment">% Number of chips per frame</span>
+chips_per_char  = 64;       <span class="comment">% Number of chips making up a character</span>
+BPSK = 2;                   <span class="comment">% Modulation scheme</span>
+
+PN_gen_taps = [8, 7, 6, 1]; <span class="comment">% Taps used to generate the M-sequence</span>
+
+h = hadamard(8);            <span class="comment">% 8-ary Hadamard transform</span>
+walsh_0 = h(1,:);           <span class="comment">% Pilot channel</span>
+walsh_5 = h(6,:);           <span class="comment">% Data channel</span>
+</pre><h2 id="3">Load Received Signal</h2><pre class="codeinput">msg_rx = load(<span class="string">'Rcvd_Levin.mat'</span>).Rcvd;
+</pre><h2 id="4">Filter &amp; Downsample Received Signal</h2><pre class="codeinput"><span class="comment">% Design the FIR root raised cosine filter</span>
+<span class="comment">%   Note: although the taps are given, I chose to compute it again for more</span>
+<span class="comment">%   precision. Span was determined experimentally, until the correct</span>
+<span class="comment">%   results were obtained.</span>
+B_RCOS = rcosdesign(RRC_filt_rolloff, 6, oversample_rate, <span class="string">'sqrt'</span>);
+
+<span class="comment">% Filter &amp; downsample</span>
+msg_filtered = filter(B_RCOS, 1, msg_rx);
+msg_downsampled = downsample(msg_filtered, oversample_rate);
+
+<span class="comment">% Determine number of frames in the signal</span>
+numFrames = length(msg_downsampled)/chips_per_frame;
+</pre><h2 id="5">Generate an M-Sequence</h2><pre class="codeinput"><span class="comment">% The decoding taps should be the companion "mirror" taps of the original</span>
+<span class="comment">% taps</span>
+mirror_taps = [PN_gen_taps(1), (PN_gen_taps(1) - PN_gen_taps(2:end))];
+
+<span class="comment">% Generate an arbitrary M-sequence</span>
+LFSR_start = [1, 0, 0, 0, 0, 0, 0, 0];
+
+<span class="comment">% Output from the LFSR</span>
+[~, m_seq] = shift_LFSR(LFSR_start, mirror_taps, chips_per_frame);
+</pre><h2 id="6">Find Cross-Correlation Between Received Signal &amp; M-Sequence</h2><p>Orthogonal codes have a cross-correlation of 0. By finding the cross-correlation with the correct M-sequence, the offset could be determined by looking for impulse-like response.</p><pre class="codeinput">cross_corr = xcorr(m_seq, real(msg_downsampled(1:chips_per_frame)));
+[~, offset] = max(cross_corr);
+start_pt = chips_per_frame - offset + 1;
+</pre><h2 id="7">Obtain Pilots</h2><p>Obtain the all-zero pilot frames at the beginning and at the end</p><pre class="codeinput"><span class="comment">% Beginning pilots</span>
+msg_pilots_beg = msg_downsampled(start_pt:(start_pt+chips_per_frame-1));
+msg_pilots_beg_dec = ~pskdemod(msg_pilots_beg, BPSK);
+
+<span class="comment">% Ending pilots</span>
+msg_pilots_end = msg_downsampled((start_pt+(numFrames-1)*chips_per_frame):end);
+msg_pilots_end_dec = ~pskdemod(msg_pilots_end, BPSK);
+</pre><h2 id="8">Obtain Phase &amp; Frequency Offsets</h2><pre class="codeinput">phase_offset_beg = unwrap(angle(msg_pilots_beg));
+phase_offset_end = unwrap(angle(msg_pilots_end));
+
+freq_offset_diff_beg = diff(phase_offset_beg - pi*msg_pilots_beg_dec);
+freq_offset_diff_end = diff(phase_offset_end - pi*msg_pilots_end_dec);
+
+freq_offset_median = median([freq_offset_diff_beg, freq_offset_diff_end]);
+freq_offset_median = mod(freq_offset_median, 2*pi);
+
+msg_pilots_beg_shifted = msg_pilots_beg.*exp(-1j*freq_offset_median*(0:chips_per_frame-1));
+phase_offset_median = median(angle(msg_pilots_beg_shifted));
+
+<span class="comment">% Report the offsets</span>
+freq_offset_hertz = freq_offset_median * chip_rate / (2*pi);
+fprintf(<span class="string">'Frequency offset: %f Hz\n'</span>, freq_offset_hertz);
+
+phase_offset_deg = phase_offset_median * 180 / pi;
+fprintf(<span class="string">'Phase offset: %f degrees\n'</span>, phase_offset_deg);
+</pre><pre class="codeoutput">Frequency offset: 108.987028 Hz
+Phase offset: -44.695325 degrees
+</pre><h2 id="9">Undo the Shifting</h2><pre class="codeinput">data_range = (start_pt+chips_per_frame):(start_pt+(numFrames-1)*chips_per_frame-1);
+msg_data = msg_downsampled(data_range);
+numDataBits = length(msg_data);
+
+freqshift = exp(-1j*(freq_offset_median*(chips_per_frame:chips_per_frame+numDataBits-1) + phase_offset_median));
+msg_freqshift = msg_data .* freqshift;
+
+<span class="comment">% Plot the results</span>
+figure
+subplot(1,2,1)
+scatter(real(msg_data), imag(msg_data), <span class="string">'.'</span>)
+hold <span class="string">on</span>
+title(<span class="string">'Original Message'</span>)
+xlim([-2.5, 2.5])
+ylim([-2.5, 2.5])
+xlabel(<span class="string">'In-Phase'</span>)
+ylabel(<span class="string">'Quadrature'</span>)
+
+subplot(1,2,2)
+scatter(real(msg_freqshift), imag(msg_freqshift), <span class="string">'.'</span>)
+title(<span class="string">'Frequency-Shifted Message'</span>)
+xlim([-2.5, 2.5])
+ylim([-2.5, 2.5])
+xlabel(<span class="string">'In-Phase'</span>)
+ylabel(<span class="string">'Quadrature'</span>)
+</pre><img vspace="5" hspace="5" src="ASLevin_SimpleCDMA_01.png" alt=""> <h2 id="10">Generate Pilots, Remove from Data</h2><p>Pilots are generated as all zeros. BPSK encoding dictates:   0 --&gt; +1   1 --&gt; -1 This can be expressed as 1-2*data</p><pre class="codeinput">pilots_modulated = pskmod(zeros(8*4, 1), BPSK);
+
+<span class="comment">% Apply the Hadamard transformation on Channel 0</span>
+pilots_trans = pilots_modulated * walsh_0;
+
+<span class="comment">% Demodulate the received transformed pilots</span>
+pilots_demod = pskdemod(pilots_trans.', BPSK);
+
+<span class="comment">% XOR the pilot with the M-sequence, and encode again</span>
+pilots_generated = pskmod(double(xor(pilots_demod(1:end-1), m_seq)), BPSK);
+
+<span class="comment">% Cancel the pilots from the data</span>
+msg_dataonly = msg_freqshift + repmat(pilots_generated, 1, numFrames-2);
+
+<span class="comment">% Present</span>
+figure
+scatter(real(msg_dataonly), imag(msg_dataonly), <span class="string">'.'</span>)
+title(<span class="string">'Frequency-Shifted Message, Pilots Cancelled'</span>)
+xlim([-2.5, 2.5])
+ylim([-2.5, 2.5])
+xlabel(<span class="string">'In-Phase'</span>)
+ylabel(<span class="string">'Quadrature'</span>)
+</pre><img vspace="5" hspace="5" src="ASLevin_SimpleCDMA_02.png" alt=""> <h2 id="11">Determine valid characters</h2><pre class="codeinput"><span class="comment">% Reshape the message into frames. Each frame is a column vector</span>
+msg_frames = reshape(msg_dataonly, chips_per_frame, []);
+
+<span class="comment">% Remove the non-character bits</span>
+msg_frames = msg_frames(1:(3*chips_per_char), :);
+msg_frames_bin = pskdemod(msg_frames, BPSK);
+numFrames_valid = size(msg_frames, 2);
+
+<span class="comment">% Reshape so that each column vector is a character</span>
+msg_chars = reshape(msg_frames, chips_per_char, []);
+
+<span class="comment">% Determine which vectors are empty characters</span>
+good_vects = find(all(abs(real(msg_chars)) &gt; 0.5));
+numChars = size(good_vects, 2);
+numBadChars = numFrames_valid*3 - numChars;
+</pre><h2 id="12">Despread</h2><pre class="codeinput"><span class="comment">% Apply the m-sequence on the first frames</span>
+msg_frames_xor_first = xor(<span class="keyword">...</span>
+    ~msg_frames_bin(:, 1:numFrames_valid-1), <span class="keyword">...</span>
+    repmat(m_seq(1:(3*chips_per_char)).', 1, numFrames_valid-1));
+
+<span class="comment">% Apply the m-sequence on the last frame</span>
+msg_frames_xor_last = xor(<span class="keyword">...</span>
+    ~msg_frames_bin(1:chips_per_char*(numBadChars/2), numFrames_valid), <span class="keyword">...</span>
+    m_seq(1:chips_per_char*(numBadChars/2)).');
+
+<span class="comment">% Modulate</span>
+msg_vect_xor = [msg_frames_xor_first(:);<span class="keyword">...</span>
+                msg_frames_xor_last];
+msg_chars_mod = reshape(pskmod(double(msg_vect_xor), BPSK), 8, []);
+
+<span class="comment">% Apply Hadamard</span>
+msg_walsh = (walsh_5 * msg_chars_mod) / 8;
+
+<span class="comment">% Decode the message</span>
+msg_chars_bin = reshape(pskdemod(msg_walsh, BPSK), 8, []);
+msg_ascii = char(bi2de(msg_chars_bin.')).';
+
+<span class="comment">% Report the message</span>
+fprintf(<span class="string">'And the secret message is...\n\t%s\n'</span>, msg_ascii)
+
+<span class="comment">% What is the meaning of this message? In fact, it is multifaceted:</span>
+<span class="comment">%   1)</span>
+</pre><pre class="codeoutput">And the secret message is...
+	Let me give you a piece of advice, junior: your music make sense to no one... but yourself.
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Simple CDMA System
+% Alon S. Levin
+% ECE-408: Wireless Communications
+% Spring 2020
+
+%% Prepare Environment
+clear, clc, close all       % Clear all current variables and outputs
+format compact              % Prepare command line output
+
+%% Simulation Parameters
+chip_rate = 1e6;            % Chip Rate [Hz]
+oversample_rate = 4;        % Oversample rate
+RRC_filt_rolloff = 0.75;    % RRC Filter Rolloff
+
+chips_per_frame = 255;      % Number of chips per frame
+chips_per_char  = 64;       % Number of chips making up a character
+BPSK = 2;                   % Modulation scheme
+
+PN_gen_taps = [8, 7, 6, 1]; % Taps used to generate the M-sequence
+
+h = hadamard(8);            % 8-ary Hadamard transform
+walsh_0 = h(1,:);           % Pilot channel
+walsh_5 = h(6,:);           % Data channel
+
+%% Load Received Signal
+msg_rx = load('Rcvd_Levin.mat').Rcvd;
+
+%% Filter & Downsample Received Signal
+
+% Design the FIR root raised cosine filter
+%   Note: although the taps are given, I chose to compute it again for more
+%   precision. Span was determined experimentally, until the correct
+%   results were obtained.
+B_RCOS = rcosdesign(RRC_filt_rolloff, 6, oversample_rate, 'sqrt');
+
+% Filter & downsample
+msg_filtered = filter(B_RCOS, 1, msg_rx);
+msg_downsampled = downsample(msg_filtered, oversample_rate);
+
+% Determine number of frames in the signal
+numFrames = length(msg_downsampled)/chips_per_frame;
+
+%% Generate an M-Sequence
+
+% The decoding taps should be the companion "mirror" taps of the original
+% taps
+mirror_taps = [PN_gen_taps(1), (PN_gen_taps(1) - PN_gen_taps(2:end))];
+
+% Generate an arbitrary M-sequence
+LFSR_start = [1, 0, 0, 0, 0, 0, 0, 0];
+
+% Output from the LFSR
+[~, m_seq] = shift_LFSR(LFSR_start, mirror_taps, chips_per_frame);
+
+%% Find Cross-Correlation Between Received Signal & M-Sequence
+% Orthogonal codes have a cross-correlation of 0. By finding the
+% cross-correlation with the correct M-sequence, the offset could be
+% determined by looking for impulse-like response.
+cross_corr = xcorr(m_seq, real(msg_downsampled(1:chips_per_frame)));
+[~, offset] = max(cross_corr);
+start_pt = chips_per_frame - offset + 1;
+
+%% Obtain Pilots
+% Obtain the all-zero pilot frames at the beginning and at the end
+
+% Beginning pilots
+msg_pilots_beg = msg_downsampled(start_pt:(start_pt+chips_per_frame-1));
+msg_pilots_beg_dec = ~pskdemod(msg_pilots_beg, BPSK);
+
+% Ending pilots
+msg_pilots_end = msg_downsampled((start_pt+(numFrames-1)*chips_per_frame):end);
+msg_pilots_end_dec = ~pskdemod(msg_pilots_end, BPSK);
+
+%% Obtain Phase & Frequency Offsets
+phase_offset_beg = unwrap(angle(msg_pilots_beg));
+phase_offset_end = unwrap(angle(msg_pilots_end));
+
+freq_offset_diff_beg = diff(phase_offset_beg - pi*msg_pilots_beg_dec);
+freq_offset_diff_end = diff(phase_offset_end - pi*msg_pilots_end_dec);
+
+freq_offset_median = median([freq_offset_diff_beg, freq_offset_diff_end]);
+freq_offset_median = mod(freq_offset_median, 2*pi);
+
+msg_pilots_beg_shifted = msg_pilots_beg.*exp(-1j*freq_offset_median*(0:chips_per_frame-1));
+phase_offset_median = median(angle(msg_pilots_beg_shifted));
+
+% Report the offsets
+freq_offset_hertz = freq_offset_median * chip_rate / (2*pi);
+fprintf('Frequency offset: %f Hz\n', freq_offset_hertz);
+
+phase_offset_deg = phase_offset_median * 180 / pi;
+fprintf('Phase offset: %f degrees\n', phase_offset_deg);
+
+%% Undo the Shifting
+data_range = (start_pt+chips_per_frame):(start_pt+(numFrames-1)*chips_per_frame-1);
+msg_data = msg_downsampled(data_range);
+numDataBits = length(msg_data);
+
+freqshift = exp(-1j*(freq_offset_median*(chips_per_frame:chips_per_frame+numDataBits-1) + phase_offset_median));
+msg_freqshift = msg_data .* freqshift;
+
+% Plot the results
+figure
+subplot(1,2,1)
+scatter(real(msg_data), imag(msg_data), '.')
+hold on
+title('Original Message')
+xlim([-2.5, 2.5])
+ylim([-2.5, 2.5])
+xlabel('In-Phase')
+ylabel('Quadrature')
+
+subplot(1,2,2)
+scatter(real(msg_freqshift), imag(msg_freqshift), '.')
+title('Frequency-Shifted Message')
+xlim([-2.5, 2.5])
+ylim([-2.5, 2.5])
+xlabel('In-Phase')
+ylabel('Quadrature')
+
+%% Generate Pilots, Remove from Data
+% Pilots are generated as all zeros. BPSK encoding dictates:
+%   0 REPLACE_WITH_DASH_DASH> +1
+%   1 REPLACE_WITH_DASH_DASH> -1
+% This can be expressed as 1-2*data
+pilots_modulated = pskmod(zeros(8*4, 1), BPSK);
+
+% Apply the Hadamard transformation on Channel 0
+pilots_trans = pilots_modulated * walsh_0;
+
+% Demodulate the received transformed pilots
+pilots_demod = pskdemod(pilots_trans.', BPSK);
+
+% XOR the pilot with the M-sequence, and encode again
+pilots_generated = pskmod(double(xor(pilots_demod(1:end-1), m_seq)), BPSK);
+
+% Cancel the pilots from the data
+msg_dataonly = msg_freqshift + repmat(pilots_generated, 1, numFrames-2);
+
+% Present
+figure
+scatter(real(msg_dataonly), imag(msg_dataonly), '.')
+title('Frequency-Shifted Message, Pilots Cancelled')
+xlim([-2.5, 2.5])
+ylim([-2.5, 2.5])
+xlabel('In-Phase')
+ylabel('Quadrature')
+
+%% Determine valid characters
+
+% Reshape the message into frames. Each frame is a column vector
+msg_frames = reshape(msg_dataonly, chips_per_frame, []);
+
+% Remove the non-character bits
+msg_frames = msg_frames(1:(3*chips_per_char), :);
+msg_frames_bin = pskdemod(msg_frames, BPSK);
+numFrames_valid = size(msg_frames, 2);
+
+% Reshape so that each column vector is a character
+msg_chars = reshape(msg_frames, chips_per_char, []);
+
+% Determine which vectors are empty characters
+good_vects = find(all(abs(real(msg_chars)) > 0.5));
+numChars = size(good_vects, 2);
+numBadChars = numFrames_valid*3 - numChars;
+
+%% Despread
+
+% Apply the m-sequence on the first frames
+msg_frames_xor_first = xor(...
+    ~msg_frames_bin(:, 1:numFrames_valid-1), ...
+    repmat(m_seq(1:(3*chips_per_char)).', 1, numFrames_valid-1));
+
+% Apply the m-sequence on the last frame
+msg_frames_xor_last = xor(...
+    ~msg_frames_bin(1:chips_per_char*(numBadChars/2), numFrames_valid), ...
+    m_seq(1:chips_per_char*(numBadChars/2)).');
+
+% Modulate
+msg_vect_xor = [msg_frames_xor_first(:);...
+                msg_frames_xor_last];
+msg_chars_mod = reshape(pskmod(double(msg_vect_xor), BPSK), 8, []);
+
+% Apply Hadamard 
+msg_walsh = (walsh_5 * msg_chars_mod) / 8;
+
+% Decode the message
+msg_chars_bin = reshape(pskdemod(msg_walsh, BPSK), 8, []);
+msg_ascii = char(bi2de(msg_chars_bin.')).';
+
+% Report the message
+fprintf('And the secret message is...\n\t%s\n', msg_ascii)
+
+% What is the meaning of this message? In fact, it is multifaceted:
+%   1) 
+##### SOURCE END #####
+--></body></html>
