@@ -1,0 +1,10 @@
+Frequency offset: 108.987028 Hz
+Phase offset: -44.695325 degrees
+
+And the secret message is...
+	Let me give you a piece of advice, junior: your music make sense to no one... but yourself.
+	
+What is the meaning of this message? In fact, it is multifaceted:
+	1) This is a quote from Prince's film "Purple Rain" (1984).
+	2) I first met Prof. Hoerning when I took his "Music & Engineering" class as a Junior.
+	3) I have shown him many strange songs (see: Eurovision) that quite often simply don't make sense to those unfamiliar to them.
