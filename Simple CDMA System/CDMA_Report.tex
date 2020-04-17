@@ -20,7 +20,7 @@
 \maketitle
 
 \begin{abstract}
-
+A simple CDMA system is presented. Specifically, a signal is received from a known transmitter with unknown M-sequence offset, frequency offset, and phase offset. A receiver system is devised, and the secret message is decoded and interpreted.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -81,10 +81,10 @@ The reshifted frames still contained pilot information, however, that was transm
 
 Note that not all chips represented characters in the signal; it is for this reason that there are symbols about the origin in the previous figure. The task, now, is to remove these non-character symbols before BPSK demodulation takes place. The signal was reshaped from a single vector to a matrix in which each column vector represented a single frame. The first $3\times64$ chips were kept in each frame, and the rest discarded. This is sufficient to clean all data frames but the last, as we do not know how many characters were transmitted in the final data frame. To solve this, the matrix was once again reshaped such that each column represented a single character; all columns in which all real components had a magnitude less than 0.5 were presumed to be ``false'' characters and removed.
 
-Finally, the resulting signal was despread with the M-sequence and Walsh channel 5, BPSK-demodulated, and translated from binary to ASCII succesfully.
+Finally, the resulting signal was despread with the M-sequence and Walsh channel 5, BPSK-demodulated, and translated from binary to ASCII successfully.
 
 \section{Results \& Discussion}
-The frequency offset was found to be approximately 108.987028 Hz. The phase offset was found to be approximately -44.695325$\deg$. The secret message was  
+The frequency offset was found to be approximately 108.987028 Hz. The phase offset was found to be approximately -44.695325$^{\circ}$. The secret message was  
 \begin{quote}
 \emph{Let me give you a piece of advice, junior: your music make sense to no one... but yourself.}
 \end{quote}
