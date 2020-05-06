@@ -12,7 +12,7 @@ format compact              % Prepare command line output
 
 % System parameters
 M = 4;                  % Modulation order: QAM
-numSyms = 1e3;          % Number of transmitted symbols
+numSyms = 48e2;         % Number of transmitted symbols
 numTx = 2;              % Number of transmitters
 numRx = 2;              % Number of receivers
 
@@ -170,4 +170,4 @@ title('BER for 2x2 QAM MIMO System')
 grid on
 xlabel('Eb/No (dB)')
 ylabel('Bit Error Rate')
-legend('Pre-Coding', 'Zero-Forcing', 'MMSE')
+legend({'Pre-Coding', 'Zero-Forcing', 'MMSE'}, 'Location', 'southwest')

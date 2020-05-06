@@ -18,7 +18,7 @@ numSyms = 48e2;         % Number of transmitted symbols
 numChan = 3;                                % Number of channels
 numSNR = 20;                                % Number of SNR values to check
 EbNo_vect = linspace(-10, numSNR, 20);      % Eb/No vector
-SNR_vect = EbNo_vect + 10*log10(log2(M)); 	% SNR vector
+SNR_vect = EbNo_vect + 10*log10(64/80); 	% SNR vector
 
 % Rayleigh Channel parameters
 Ts = 1e-3;                                  % Sample rate for Rayleigh Channel
@@ -35,6 +35,16 @@ BER_MMSE = nan(numChan, numSNR);
 
 %% Zero-Forcing
 for channel_ticker = 1:numChan
+    % Build the Rayleigh channel
+    rayleighchan = comm.RayleighChannel(...
+        'SampleRate', Ts, ...
+        'PathDelays', tau, ...
+        'AveragePathGains', pdb, ...
+        'MaximumDopplerShift', Fd, ...
+        'RandomStream','mt19937ar with seed', ...
+        'Seed', randi(1e7) ...
+    );
+
     % Generate a transmit signal
     tx_syms = randi([0, M-1], 1, numSyms);
     tx_mod = qammod(tx_syms, M);
@@ -49,16 +59,6 @@ for channel_ticker = 1:numChan
     % Add cyclic prefix
     tx_withcp = [tx_postifft(49:64,:); ...
                  tx_postifft];
-    
-    % Build the Rayleigh channel
-    rayleighchan = comm.RayleighChannel(...
-        'SampleRate', Ts, ...
-        'PathDelays', tau, ...
-        'AveragePathGains', pdb, ...
-        'MaximumDopplerShift', Fd, ...
-        'RandomStream','mt19937ar with seed', ...
-        'Seed', randi(1e7) ...
-    );
     
     % Transmit through the Rayleigh channel
     tx_rayleigh = zeros(size(tx_withcp));
@@ -174,11 +174,11 @@ end
 
 %% Plot BERs
 figure
-semilogy(EbNo_vect, mean(BER_ZF)', '-*', 'LineWidth', 2)
+semilogy(EbNo_vect, mean(BER_ZF)', '-.*', 'LineWidth', 2)
 hold on
-semilogy(EbNo_vect, mean(BER_MMSE)', '-^', 'LineWidth', 2)
-title('BER for OFDM System')
+semilogy(EbNo_vect, mean(BER_MMSE)', '-.^', 'LineWidth', 2)
+title('BER for QAM OFDM System')
 grid on
 xlabel('Eb/No (dB)')
 ylabel('Bit Error Rate')
-legend('Zero-Forcing', 'MMSE')
+legend({'Zero-Forcing', 'MMSE'}, 'Location', 'southwest')
