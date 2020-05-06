@@ -1,0 +1,419 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>MIMO-OFDM Project</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-06"><meta name="DC.source" content="OFDM.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>MIMO-OFDM Project</h1><!--introduction--><p>Alon S. Levin ECE-408: Wireless Communications Spring 2020 Part 2: OFDM</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare Environment</a></li><li><a href="#2">Simulation Parameters</a></li><li><a href="#3">Initialize BER Vectors</a></li><li><a href="#4">Zero-Forcing</a></li><li><a href="#5">MMSE</a></li><li><a href="#6">Plot BERs</a></li></ul></div><h2 id="1">Prepare Environment</h2><pre class="codeinput">clear, clc, close <span class="string">all</span>       <span class="comment">% Clear all current variables and outputs</span>
+format <span class="string">compact</span>              <span class="comment">% Prepare command line output</span>
+</pre><h2 id="2">Simulation Parameters</h2><pre class="codeinput"><span class="comment">% System parameters</span>
+M = 4;                  <span class="comment">% Modulation order: QAM</span>
+numSyms = 48e2;         <span class="comment">% Number of transmitted symbols</span>
+
+<span class="comment">% Channel parameters</span>
+numChan = 3;                                <span class="comment">% Number of channels</span>
+numSNR = 20;                                <span class="comment">% Number of SNR values to check</span>
+EbNo_vect = linspace(-10, numSNR, 20);      <span class="comment">% Eb/No vector</span>
+SNR_vect = EbNo_vect + 10*log10(64/80); 	<span class="comment">% SNR vector</span>
+
+<span class="comment">% Rayleigh Channel parameters</span>
+Ts = 1e-3;                                  <span class="comment">% Sample rate for Rayleigh Channel</span>
+Fd = 0;                                     <span class="comment">% Maximum Doppler Shift</span>
+tau = [0 Ts/5 Ts/3 Ts];                     <span class="comment">% Path delays</span>
+pdb = [0 -2 -3.33 -10];                     <span class="comment">% Average path gain</span>
+</pre><h2 id="3">Initialize BER Vectors</h2><p>BER_ZF   --&gt; Zero-forcing BER_MMSE --&gt; Minimum Mean Squared Error</p><pre class="codeinput">BER_ZF   = nan(numChan, numSNR);
+BER_MMSE = nan(numChan, numSNR);
+</pre><h2 id="4">Zero-Forcing</h2><pre class="codeinput"><span class="keyword">for</span> channel_ticker = 1:numChan
+    <span class="comment">% Build the Rayleigh channel</span>
+    rayleighchan = comm.RayleighChannel(<span class="keyword">...</span>
+        <span class="string">'SampleRate'</span>, Ts, <span class="keyword">...</span>
+        <span class="string">'PathDelays'</span>, tau, <span class="keyword">...</span>
+        <span class="string">'AveragePathGains'</span>, pdb, <span class="keyword">...</span>
+        <span class="string">'MaximumDopplerShift'</span>, Fd, <span class="keyword">...</span>
+        <span class="string">'RandomStream'</span>,<span class="string">'mt19937ar with seed'</span>, <span class="keyword">...</span>
+        <span class="string">'Seed'</span>, randi(1e7) <span class="keyword">...</span>
+    );
+
+    <span class="comment">% Generate a transmit signal</span>
+    tx_syms = randi([0, M-1], 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+
+    <span class="comment">% Convert signal to frames</span>
+    tx_ofdm_frames = makeOFDMframe(tx_mod);
+    numFrames = size(tx_ofdm_frames, 2);
+
+    <span class="comment">% Apply IFFT</span>
+    tx_postifft = ifft(tx_ofdm_frames, 64);
+
+    <span class="comment">% Add cyclic prefix</span>
+    tx_withcp = [tx_postifft(49:64,:); <span class="keyword">...</span>
+                 tx_postifft];
+
+    <span class="comment">% Transmit through the Rayleigh channel</span>
+    tx_rayleigh = zeros(size(tx_withcp));
+    channel_state = zeros(size(tx_withcp));
+    <span class="keyword">for</span> frame_ticker = 1:numFrames
+        tx_rayleigh(:, frame_ticker) = rayleighchan(tx_withcp(:, frame_ticker));
+        channel_state(:, frame_ticker) = rayleighchan(ones(80,1));
+    <span class="keyword">end</span>
+
+    <span class="comment">% Add AWGN per SNR values, post-code, find BER</span>
+    <span class="keyword">for</span> SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+
+        <span class="comment">% Generate AWGN</span>
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * <span class="keyword">...</span>
+            (randn(80, numFrames) + 1j*randn(80, numFrames));
+
+        <span class="comment">% Add AWGN to the channel</span>
+        tx_awgnchannel = tx_rayleigh + awgn;
+
+        <span class="comment">% Strip cyclic prefix, apply FFT</span>
+        rx_nocp = tx_awgnchannel(17:end, :);
+        rx_fft = fft(rx_nocp, 64);
+
+        <span class="comment">% Apply zero-forcing equalizer</span>
+        rx_zf = rx_fft ./ channel_state(17:end, :);
+
+        <span class="comment">% Restore data</span>
+        rx_data = rx_zf([<span class="keyword">...</span>
+            6:10, <span class="keyword">...</span><span class="comment">   % -26 --&gt; -22</span>
+            12:24, <span class="keyword">...</span><span class="comment">  % -20 --&gt; -08</span>
+            26:31, <span class="keyword">...</span><span class="comment">  % -06 --&gt; -01</span>
+            33:38, <span class="keyword">...</span><span class="comment">  %  01 --&gt;  06</span>
+            40:52, <span class="keyword">...</span><span class="comment">  %  08 --&gt;  20</span>
+            54:58], :); <span class="comment">%  22 --&gt;  26</span>
+        rx_data_reshaped = reshape(rx_data, 1, []);
+
+        <span class="comment">% Demodulate, compute BER</span>
+        rx_demod = qamdemod(rx_data_reshaped, M);
+        BER_ZF(channel_ticker, SNR_ticker) = mean(rx_demod ~= tx_syms);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="5">MMSE</h2><pre class="codeinput"><span class="keyword">for</span> channel_ticker = 1:numChan
+    <span class="comment">% Generate a transmit signal</span>
+    tx_syms = randi([0, M-1], 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+
+    <span class="comment">% Convert signal to frames</span>
+    tx_ofdm_frames = makeOFDMframe(tx_mod);
+    numFrames = size(tx_ofdm_frames, 2);
+
+    <span class="comment">% Apply IFFT</span>
+    tx_postifft = ifft(tx_ofdm_frames, 64);
+
+    <span class="comment">% Add cyclic prefix</span>
+    tx_withcp = [tx_postifft(49:64,:); <span class="keyword">...</span>
+                 tx_postifft];
+
+    <span class="comment">% Build the Rayleigh channel</span>
+    rayleighchan = comm.RayleighChannel(<span class="keyword">...</span>
+        <span class="string">'SampleRate'</span>, Ts, <span class="keyword">...</span>
+        <span class="string">'PathDelays'</span>, tau, <span class="keyword">...</span>
+        <span class="string">'AveragePathGains'</span>, pdb, <span class="keyword">...</span>
+        <span class="string">'MaximumDopplerShift'</span>, Fd, <span class="keyword">...</span>
+        <span class="string">'RandomStream'</span>,<span class="string">'mt19937ar with seed'</span>, <span class="keyword">...</span>
+        <span class="string">'Seed'</span>, randi(1e7) <span class="keyword">...</span>
+    );
+
+    <span class="comment">% Transmit through the Rayleigh channel</span>
+    tx_rayleigh = zeros(size(tx_withcp));
+    channel_state = zeros(size(tx_withcp));
+    <span class="keyword">for</span> frame_ticker = 1:numFrames
+        tx_rayleigh(:, frame_ticker) = rayleighchan(tx_withcp(:, frame_ticker));
+        channel_state(:, frame_ticker) = rayleighchan(ones(80,1));
+    <span class="keyword">end</span>
+
+    <span class="comment">% Add AWGN per SNR values, post-code, find BER</span>
+    <span class="keyword">for</span> SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+
+        <span class="comment">% Generate AWGN</span>
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * <span class="keyword">...</span>
+            (randn(80, numFrames) + 1j*randn(80, numFrames));
+
+        <span class="comment">% Add AWGN to the channel</span>
+        tx_awgnchannel = tx_rayleigh + awgn;
+
+        <span class="comment">% Strip cyclic prefix, apply FFT</span>
+        rx_nocp = tx_awgnchannel(17:end, :);
+        rx_fft = fft(rx_nocp, 64);
+
+        <span class="comment">% Apply zero-forcing equalizer</span>
+        norm = conj(channel_state(17:end,:)) .* channel_state(17:end,:) + 10^(-currSNR/20);
+        rx_mmse = rx_fft .* conj(channel_state(17:end,:)) ./ norm;
+
+        <span class="comment">% Restore data</span>
+        rx_data = rx_mmse([<span class="keyword">...</span>
+            6:10, <span class="keyword">...</span><span class="comment">   % -26 --&gt; -22</span>
+            12:24, <span class="keyword">...</span><span class="comment">  % -20 --&gt; -08</span>
+            26:31, <span class="keyword">...</span><span class="comment">  % -06 --&gt; -01</span>
+            33:38, <span class="keyword">...</span><span class="comment">  %  01 --&gt;  06</span>
+            40:52, <span class="keyword">...</span><span class="comment">  %  08 --&gt;  20</span>
+            54:58], :); <span class="comment">%  22 --&gt;  26</span>
+        rx_data_reshaped = reshape(rx_data, 1, []);
+
+        <span class="comment">% Demodulate, compute BER</span>
+        rx_demod = qamdemod(rx_data_reshaped, M);
+        BER_MMSE(channel_ticker, SNR_ticker) = mean(rx_demod ~= tx_syms);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="6">Plot BERs</h2><pre class="codeinput">figure
+semilogy(EbNo_vect, mean(BER_ZF)', <span class="string">'-.*'</span>, <span class="string">'LineWidth'</span>, 2)
+hold <span class="string">on</span>
+semilogy(EbNo_vect, mean(BER_MMSE)', <span class="string">'-.^'</span>, <span class="string">'LineWidth'</span>, 2)
+title(<span class="string">'BER for QAM OFDM System'</span>)
+grid <span class="string">on</span>
+xlabel(<span class="string">'Eb/No (dB)'</span>)
+ylabel(<span class="string">'Bit Error Rate'</span>)
+legend({<span class="string">'Zero-Forcing'</span>, <span class="string">'MMSE'</span>}, <span class="string">'Location'</span>, <span class="string">'southwest'</span>)
+</pre><img vspace="5" hspace="5" src="OFDM_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% MIMO-OFDM Project
+% Alon S. Levin
+% ECE-408: Wireless Communications
+% Spring 2020
+% Part 2: OFDM
+
+%% Prepare Environment
+clear, clc, close all       % Clear all current variables and outputs
+format compact              % Prepare command line output
+
+%% Simulation Parameters
+
+% System parameters
+M = 4;                  % Modulation order: QAM
+numSyms = 48e2;         % Number of transmitted symbols
+
+% Channel parameters
+numChan = 3;                                % Number of channels
+numSNR = 20;                                % Number of SNR values to check
+EbNo_vect = linspace(-10, numSNR, 20);      % Eb/No vector
+SNR_vect = EbNo_vect + 10*log10(64/80); 	% SNR vector
+
+% Rayleigh Channel parameters
+Ts = 1e-3;                                  % Sample rate for Rayleigh Channel
+Fd = 0;                                     % Maximum Doppler Shift
+tau = [0 Ts/5 Ts/3 Ts];                     % Path delays
+pdb = [0 -2 -3.33 -10];                     % Average path gain
+
+
+%% Initialize BER Vectors
+% BER_ZF   REPLACE_WITH_DASH_DASH> Zero-forcing
+% BER_MMSE REPLACE_WITH_DASH_DASH> Minimum Mean Squared Error
+BER_ZF   = nan(numChan, numSNR);
+BER_MMSE = nan(numChan, numSNR);
+
+%% Zero-Forcing
+for channel_ticker = 1:numChan
+    % Build the Rayleigh channel
+    rayleighchan = comm.RayleighChannel(...
+        'SampleRate', Ts, ...
+        'PathDelays', tau, ...
+        'AveragePathGains', pdb, ...
+        'MaximumDopplerShift', Fd, ...
+        'RandomStream','mt19937ar with seed', ...
+        'Seed', randi(1e7) ...
+    );
+
+    % Generate a transmit signal
+    tx_syms = randi([0, M-1], 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+    
+    % Convert signal to frames
+    tx_ofdm_frames = makeOFDMframe(tx_mod);
+    numFrames = size(tx_ofdm_frames, 2);
+    
+    % Apply IFFT
+    tx_postifft = ifft(tx_ofdm_frames, 64);
+    
+    % Add cyclic prefix
+    tx_withcp = [tx_postifft(49:64,:); ...
+                 tx_postifft];
+    
+    % Transmit through the Rayleigh channel
+    tx_rayleigh = zeros(size(tx_withcp));
+    channel_state = zeros(size(tx_withcp));
+    for frame_ticker = 1:numFrames
+        tx_rayleigh(:, frame_ticker) = rayleighchan(tx_withcp(:, frame_ticker));
+        channel_state(:, frame_ticker) = rayleighchan(ones(80,1));
+    end
+    
+    % Add AWGN per SNR values, post-code, find BER
+    for SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+
+        % Generate AWGN
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * ...
+            (randn(80, numFrames) + 1j*randn(80, numFrames));
+
+        % Add AWGN to the channel
+        tx_awgnchannel = tx_rayleigh + awgn;
+        
+        % Strip cyclic prefix, apply FFT
+        rx_nocp = tx_awgnchannel(17:end, :);
+        rx_fft = fft(rx_nocp, 64);
+        
+        % Apply zero-forcing equalizer
+        rx_zf = rx_fft ./ channel_state(17:end, :);
+        
+        % Restore data
+        rx_data = rx_zf([...
+            6:10, ...   % -26 REPLACE_WITH_DASH_DASH> -22
+            12:24, ...  % -20 REPLACE_WITH_DASH_DASH> -08
+            26:31, ...  % -06 REPLACE_WITH_DASH_DASH> -01
+            33:38, ...  %  01 REPLACE_WITH_DASH_DASH>  06
+            40:52, ...  %  08 REPLACE_WITH_DASH_DASH>  20
+            54:58], :); %  22 REPLACE_WITH_DASH_DASH>  26
+        rx_data_reshaped = reshape(rx_data, 1, []);
+        
+        % Demodulate, compute BER
+        rx_demod = qamdemod(rx_data_reshaped, M);
+        BER_ZF(channel_ticker, SNR_ticker) = mean(rx_demod ~= tx_syms);
+    end
+end
+
+%% MMSE
+for channel_ticker = 1:numChan
+    % Generate a transmit signal
+    tx_syms = randi([0, M-1], 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+    
+    % Convert signal to frames
+    tx_ofdm_frames = makeOFDMframe(tx_mod);
+    numFrames = size(tx_ofdm_frames, 2);
+    
+    % Apply IFFT
+    tx_postifft = ifft(tx_ofdm_frames, 64);
+    
+    % Add cyclic prefix
+    tx_withcp = [tx_postifft(49:64,:); ...
+                 tx_postifft];
+    
+    % Build the Rayleigh channel
+    rayleighchan = comm.RayleighChannel(...
+        'SampleRate', Ts, ...
+        'PathDelays', tau, ...
+        'AveragePathGains', pdb, ...
+        'MaximumDopplerShift', Fd, ...
+        'RandomStream','mt19937ar with seed', ...
+        'Seed', randi(1e7) ...
+    );
+    
+    % Transmit through the Rayleigh channel
+    tx_rayleigh = zeros(size(tx_withcp));
+    channel_state = zeros(size(tx_withcp));
+    for frame_ticker = 1:numFrames
+        tx_rayleigh(:, frame_ticker) = rayleighchan(tx_withcp(:, frame_ticker));
+        channel_state(:, frame_ticker) = rayleighchan(ones(80,1));
+    end
+    
+    % Add AWGN per SNR values, post-code, find BER
+    for SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+
+        % Generate AWGN
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * ...
+            (randn(80, numFrames) + 1j*randn(80, numFrames));
+
+        % Add AWGN to the channel
+        tx_awgnchannel = tx_rayleigh + awgn;
+        
+        % Strip cyclic prefix, apply FFT
+        rx_nocp = tx_awgnchannel(17:end, :);
+        rx_fft = fft(rx_nocp, 64);
+        
+        % Apply zero-forcing equalizer
+        norm = conj(channel_state(17:end,:)) .* channel_state(17:end,:) + 10^(-currSNR/20);
+        rx_mmse = rx_fft .* conj(channel_state(17:end,:)) ./ norm;
+        
+        % Restore data
+        rx_data = rx_mmse([...
+            6:10, ...   % -26 REPLACE_WITH_DASH_DASH> -22
+            12:24, ...  % -20 REPLACE_WITH_DASH_DASH> -08
+            26:31, ...  % -06 REPLACE_WITH_DASH_DASH> -01
+            33:38, ...  %  01 REPLACE_WITH_DASH_DASH>  06
+            40:52, ...  %  08 REPLACE_WITH_DASH_DASH>  20
+            54:58], :); %  22 REPLACE_WITH_DASH_DASH>  26
+        rx_data_reshaped = reshape(rx_data, 1, []);
+        
+        % Demodulate, compute BER
+        rx_demod = qamdemod(rx_data_reshaped, M);
+        BER_MMSE(channel_ticker, SNR_ticker) = mean(rx_demod ~= tx_syms);
+    end
+end
+
+%% Plot BERs
+figure
+semilogy(EbNo_vect, mean(BER_ZF)', '-.*', 'LineWidth', 2)
+hold on
+semilogy(EbNo_vect, mean(BER_MMSE)', '-.^', 'LineWidth', 2)
+title('BER for QAM OFDM System')
+grid on
+xlabel('Eb/No (dB)')
+ylabel('Bit Error Rate')
+legend({'Zero-Forcing', 'MMSE'}, 'Location', 'southwest')
+##### SOURCE END #####
+--></body></html>

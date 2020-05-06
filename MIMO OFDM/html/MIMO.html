@@ -1,0 +1,395 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>MIMO-OFDM Project</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-06"><meta name="DC.source" content="MIMO.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>MIMO-OFDM Project</h1><!--introduction--><p>Alon S. Levin ECE-408: Wireless Communications Spring 2020 Part 1: MIMO</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare Environment</a></li><li><a href="#2">Simulation Parameters</a></li><li><a href="#3">Initialize BER Vectors</a></li><li><a href="#4">Pre-Coding</a></li><li><a href="#5">Zero-Forcing</a></li><li><a href="#6">MMSE</a></li><li><a href="#7">Plot BERs</a></li></ul></div><h2 id="1">Prepare Environment</h2><pre class="codeinput">clear, clc, close <span class="string">all</span>       <span class="comment">% Clear all current variables and outputs</span>
+format <span class="string">compact</span>              <span class="comment">% Prepare command line output</span>
+</pre><h2 id="2">Simulation Parameters</h2><pre class="codeinput"><span class="comment">% System parameters</span>
+M = 4;                  <span class="comment">% Modulation order: QAM</span>
+numSyms = 48e2;         <span class="comment">% Number of transmitted symbols</span>
+numTx = 2;              <span class="comment">% Number of transmitters</span>
+numRx = 2;              <span class="comment">% Number of receivers</span>
+
+<span class="comment">% Channel parameters</span>
+numChan = 3;                                <span class="comment">% Number of channels</span>
+numSNR = 20;                                <span class="comment">% Number of SNR values to check</span>
+EbNo_vect = linspace(-10, numSNR, 20);      <span class="comment">% Eb/No vector</span>
+SNR_vect = EbNo_vect + 10*log10(log2(M)); 	<span class="comment">% SNR vector</span>
+</pre><h2 id="3">Initialize BER Vectors</h2><p>BER_PC   --&gt; Pre-coding BER_ZF   --&gt; Zero-forcing BER_MMSE --&gt; Minimum Mean Squared Error</p><pre class="codeinput">BER_PC   = nan(numChan, numSNR);
+BER_ZF   = nan(numChan, numSNR);
+BER_MMSE = nan(numChan, numSNR);
+</pre><h2 id="4">Pre-Coding</h2><pre class="codeinput"><span class="keyword">for</span> channel_ticker = 1:numChan
+    <span class="comment">% Generate a transmit signal</span>
+    tx_syms = randi([0, M-1], numTx, 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+
+    <span class="comment">% Build a channel</span>
+    H = sqrt(1/2)*(randn(numRx, numTx, numSyms) + 1j*randn(numRx, numTx, numSyms));
+
+    <span class="comment">% Perform SVD, pre-code, and apply the channel</span>
+    U = zeros(numRx, numTx, numSyms);
+    tx_precode = zeros(numRx, 1, numSyms);
+    tx_channel = zeros(numRx, 1, numSyms);
+
+    <span class="keyword">for</span> sym_ticker = 1:numSyms
+        currH = H(:,:,sym_ticker);
+
+        <span class="comment">% SVD</span>
+        [U(:,:,sym_ticker), ~, currV] = svd(currH);
+
+        <span class="comment">% Pre-code</span>
+        tx_precode(:,:,sym_ticker) = currV * tx_mod(:,:,sym_ticker);
+
+        <span class="comment">% Apply the channel</span>
+        tx_channel(:,:,sym_ticker) = currH * tx_precode(:,:,sym_ticker);
+    <span class="keyword">end</span>
+
+    <span class="comment">% Add AWGN per SNR values, post-code, find BER</span>
+    <span class="keyword">for</span> SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+
+        <span class="comment">% Generate AWGN</span>
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * <span class="keyword">...</span>
+            (randn(numRx, 1, numSyms) + 1j*randn(numRx, 1, numSyms));
+
+        <span class="comment">% Add AWGN to the channel</span>
+        tx_awgnchannel = tx_channel + awgn;
+
+        <span class="comment">% Post-code</span>
+        rx_postcode = zeros(numRx, 1, numSyms);
+        <span class="keyword">for</span> sym_ticker = 1:numSyms
+            rx_postcode(:,:,sym_ticker) = U(:,:,sym_ticker)' * tx_awgnchannel(:,:,sym_ticker);
+        <span class="keyword">end</span>
+
+        <span class="comment">% Demodulate, compute BER</span>
+        rx_demod = qamdemod(rx_postcode, M);
+        BER_PC(channel_ticker, SNR_ticker) = mean(any(rx_demod ~= tx_syms));
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="5">Zero-Forcing</h2><pre class="codeinput"><span class="keyword">for</span> channel_ticker = 1:numChan
+    <span class="comment">% Generate a transmit signal</span>
+    tx_syms = randi([0, M-1], numTx, 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+
+    <span class="comment">% Build a channel</span>
+    H = sqrt(1/2)*(randn(numRx, numTx, numSyms) + 1j*randn(numRx, numTx, numSyms));
+
+    <span class="comment">% Apply the channel</span>
+    tx_channel = zeros(numRx, 1, numSyms);
+    <span class="keyword">for</span> sym_ticker = 1:numSyms
+        tx_channel(:,:,sym_ticker) = H(:,:,sym_ticker) * tx_mod(:,:,sym_ticker);
+    <span class="keyword">end</span>
+
+    <span class="comment">% Add AWGN per SNR values, apply zero-forcing equalizer, find BER</span>
+    <span class="keyword">for</span> SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+
+        <span class="comment">% Generate AWGN</span>
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * <span class="keyword">...</span>
+            (randn(numRx, 1, numSyms) + 1j*randn(numRx, 1, numSyms));
+
+        <span class="comment">% Add AWGN to the channel</span>
+        tx_awgnchannel = tx_channel + awgn;
+
+        <span class="comment">% Apply zero-forcing equalizer</span>
+        rx_zf = zeros(numRx, 1, numSyms);
+        <span class="keyword">for</span> sym_ticker = 1:numSyms
+            currH = H(:,:,sym_ticker);
+            W = (currH' * currH) \ currH';
+            rx_zf(:,:,sym_ticker) = W * tx_awgnchannel(:,:,sym_ticker);
+        <span class="keyword">end</span>
+
+        <span class="comment">% Demodulate, compute BER</span>
+        rx_demod = qamdemod(rx_zf, M);
+        BER_ZF(channel_ticker, SNR_ticker) = mean(any(rx_demod ~= tx_syms));
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="6">MMSE</h2><pre class="codeinput"><span class="keyword">for</span> channel_ticker = 1:numChan
+    <span class="comment">% Generate a transmit signal</span>
+    tx_syms = randi([0, M-1], numTx, 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+
+    <span class="comment">% Build a channel</span>
+    H = sqrt(1/2)*(randn(numRx, numTx, numSyms) + 1j*randn(numRx, numTx, numSyms));
+
+    <span class="comment">% Apply the channel</span>
+    tx_channel = zeros(numRx, 1, numSyms);
+    <span class="keyword">for</span> sym_ticker = 1:numSyms
+        tx_channel(:,:,sym_ticker) = H(:,:,sym_ticker) * tx_mod(:,:,sym_ticker);
+    <span class="keyword">end</span>
+
+    <span class="comment">% Add AWGN per SNR values, apply MMSE equalizer, find BER</span>
+    <span class="keyword">for</span> SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+
+        <span class="comment">% Generate AWGN</span>
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * <span class="keyword">...</span>
+            (randn(numRx, 1, numSyms) + 1j*randn(numRx, 1, numSyms));
+
+        <span class="comment">% Add AWGN to the channel</span>
+        tx_awgnchannel = tx_channel + awgn;
+
+        <span class="comment">% Apply MMSE equalizer</span>
+        rx_mmse = zeros(numRx, 1, numSyms);
+        <span class="keyword">for</span> sym_ticker = 1:numSyms
+            currH = H(:,:,sym_ticker);
+            W = (currH'*currH + eye(numTx)*10^(-currSNR/20)) \ currH';
+            rx_mmse(:,:,sym_ticker) = W * tx_awgnchannel(:,:,sym_ticker);
+        <span class="keyword">end</span>
+
+        <span class="comment">% Demodulate, compute BER</span>
+        rx_demod = qamdemod(rx_mmse, M);
+        BER_MMSE(channel_ticker, SNR_ticker) = mean(any(rx_demod ~= tx_syms));
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="7">Plot BERs</h2><pre class="codeinput">figure
+semilogy(EbNo_vect, mean(BER_PC)', <span class="string">'-s'</span>, <span class="string">'LineWidth'</span>, 2)
+hold <span class="string">on</span>
+semilogy(EbNo_vect, mean(BER_ZF)', <span class="string">'-*'</span>, <span class="string">'LineWidth'</span>, 2)
+semilogy(EbNo_vect, mean(BER_MMSE)', <span class="string">'-^'</span>, <span class="string">'LineWidth'</span>, 2)
+title(<span class="string">'BER for 2x2 QAM MIMO System'</span>)
+grid <span class="string">on</span>
+xlabel(<span class="string">'Eb/No (dB)'</span>)
+ylabel(<span class="string">'Bit Error Rate'</span>)
+legend({<span class="string">'Pre-Coding'</span>, <span class="string">'Zero-Forcing'</span>, <span class="string">'MMSE'</span>}, <span class="string">'Location'</span>, <span class="string">'southwest'</span>)
+</pre><img vspace="5" hspace="5" src="MIMO_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% MIMO-OFDM Project
+% Alon S. Levin
+% ECE-408: Wireless Communications
+% Spring 2020
+% Part 1: MIMO
+
+%% Prepare Environment
+clear, clc, close all       % Clear all current variables and outputs
+format compact              % Prepare command line output
+
+%% Simulation Parameters
+
+% System parameters
+M = 4;                  % Modulation order: QAM
+numSyms = 48e2;         % Number of transmitted symbols
+numTx = 2;              % Number of transmitters
+numRx = 2;              % Number of receivers
+
+% Channel parameters
+numChan = 3;                                % Number of channels
+numSNR = 20;                                % Number of SNR values to check
+EbNo_vect = linspace(-10, numSNR, 20);      % Eb/No vector
+SNR_vect = EbNo_vect + 10*log10(log2(M)); 	% SNR vector
+
+%% Initialize BER Vectors
+% BER_PC   REPLACE_WITH_DASH_DASH> Pre-coding
+% BER_ZF   REPLACE_WITH_DASH_DASH> Zero-forcing
+% BER_MMSE REPLACE_WITH_DASH_DASH> Minimum Mean Squared Error
+BER_PC   = nan(numChan, numSNR);
+BER_ZF   = nan(numChan, numSNR);
+BER_MMSE = nan(numChan, numSNR);
+
+%% Pre-Coding
+for channel_ticker = 1:numChan
+    % Generate a transmit signal
+    tx_syms = randi([0, M-1], numTx, 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+    
+    % Build a channel
+    H = sqrt(1/2)*(randn(numRx, numTx, numSyms) + 1j*randn(numRx, numTx, numSyms));
+    
+    % Perform SVD, pre-code, and apply the channel
+    U = zeros(numRx, numTx, numSyms);
+    tx_precode = zeros(numRx, 1, numSyms);
+    tx_channel = zeros(numRx, 1, numSyms);
+    
+    for sym_ticker = 1:numSyms
+        currH = H(:,:,sym_ticker);
+        
+        % SVD
+        [U(:,:,sym_ticker), ~, currV] = svd(currH);
+        
+        % Pre-code
+        tx_precode(:,:,sym_ticker) = currV * tx_mod(:,:,sym_ticker);
+        
+        % Apply the channel
+        tx_channel(:,:,sym_ticker) = currH * tx_precode(:,:,sym_ticker);
+    end
+    
+    % Add AWGN per SNR values, post-code, find BER
+    for SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+        
+        % Generate AWGN
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * ...
+            (randn(numRx, 1, numSyms) + 1j*randn(numRx, 1, numSyms));
+        
+        % Add AWGN to the channel
+        tx_awgnchannel = tx_channel + awgn;
+        
+        % Post-code
+        rx_postcode = zeros(numRx, 1, numSyms);
+        for sym_ticker = 1:numSyms
+            rx_postcode(:,:,sym_ticker) = U(:,:,sym_ticker)' * tx_awgnchannel(:,:,sym_ticker);
+        end
+        
+        % Demodulate, compute BER
+        rx_demod = qamdemod(rx_postcode, M);
+        BER_PC(channel_ticker, SNR_ticker) = mean(any(rx_demod ~= tx_syms));
+    end
+end
+
+%% Zero-Forcing
+for channel_ticker = 1:numChan
+    % Generate a transmit signal
+    tx_syms = randi([0, M-1], numTx, 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+
+    % Build a channel
+    H = sqrt(1/2)*(randn(numRx, numTx, numSyms) + 1j*randn(numRx, numTx, numSyms));
+    
+    % Apply the channel
+    tx_channel = zeros(numRx, 1, numSyms);
+    for sym_ticker = 1:numSyms
+        tx_channel(:,:,sym_ticker) = H(:,:,sym_ticker) * tx_mod(:,:,sym_ticker);
+    end
+    
+    % Add AWGN per SNR values, apply zero-forcing equalizer, find BER
+    for SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+        
+        % Generate AWGN
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * ...
+            (randn(numRx, 1, numSyms) + 1j*randn(numRx, 1, numSyms));
+        
+        % Add AWGN to the channel
+        tx_awgnchannel = tx_channel + awgn;
+        
+        % Apply zero-forcing equalizer
+        rx_zf = zeros(numRx, 1, numSyms);
+        for sym_ticker = 1:numSyms
+            currH = H(:,:,sym_ticker);
+            W = (currH' * currH) \ currH';
+            rx_zf(:,:,sym_ticker) = W * tx_awgnchannel(:,:,sym_ticker);
+        end
+        
+        % Demodulate, compute BER
+        rx_demod = qamdemod(rx_zf, M);
+        BER_ZF(channel_ticker, SNR_ticker) = mean(any(rx_demod ~= tx_syms));
+    end
+end
+
+%% MMSE
+for channel_ticker = 1:numChan
+    % Generate a transmit signal
+    tx_syms = randi([0, M-1], numTx, 1, numSyms);
+    tx_mod = qammod(tx_syms, M);
+
+    % Build a channel
+    H = sqrt(1/2)*(randn(numRx, numTx, numSyms) + 1j*randn(numRx, numTx, numSyms));
+    
+    % Apply the channel
+    tx_channel = zeros(numRx, 1, numSyms);
+    for sym_ticker = 1:numSyms
+        tx_channel(:,:,sym_ticker) = H(:,:,sym_ticker) * tx_mod(:,:,sym_ticker);
+    end
+    
+    % Add AWGN per SNR values, apply MMSE equalizer, find BER
+    for SNR_ticker = 1:numSNR
+        currSNR = SNR_vect(SNR_ticker);
+        
+        % Generate AWGN
+        awgn = 10^(-currSNR/20) * sqrt(1/2) * ...
+            (randn(numRx, 1, numSyms) + 1j*randn(numRx, 1, numSyms));
+        
+        % Add AWGN to the channel
+        tx_awgnchannel = tx_channel + awgn;
+        
+        % Apply MMSE equalizer
+        rx_mmse = zeros(numRx, 1, numSyms);
+        for sym_ticker = 1:numSyms
+            currH = H(:,:,sym_ticker);
+            W = (currH'*currH + eye(numTx)*10^(-currSNR/20)) \ currH';
+            rx_mmse(:,:,sym_ticker) = W * tx_awgnchannel(:,:,sym_ticker);
+        end
+        
+        % Demodulate, compute BER
+        rx_demod = qamdemod(rx_mmse, M);
+        BER_MMSE(channel_ticker, SNR_ticker) = mean(any(rx_demod ~= tx_syms));
+    end
+end
+
+%% Plot BERs
+figure
+semilogy(EbNo_vect, mean(BER_PC)', '-s', 'LineWidth', 2)
+hold on
+semilogy(EbNo_vect, mean(BER_ZF)', '-*', 'LineWidth', 2)
+semilogy(EbNo_vect, mean(BER_MMSE)', '-^', 'LineWidth', 2)
+title('BER for 2x2 QAM MIMO System')
+grid on
+xlabel('Eb/No (dB)')
+ylabel('Bit Error Rate')
+legend({'Pre-Coding', 'Zero-Forcing', 'MMSE'}, 'Location', 'southwest')
+##### SOURCE END #####
+--></body></html>
