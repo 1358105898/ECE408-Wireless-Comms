@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6800 64-bit) (preloaded format=pdflatex 2020.2.25)  6 MAY 2020 14:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6800 64-bit) (preloaded format=pdflatex 2020.2.25)  10 MAY 2020 03:20
 entering extended mode
 **./ASLevin_MIMOOFDM_Report.tex
 (ASLevin_MIMOOFDM_Report.tex
@@ -445,53 +445,100 @@ Underfull \hbox (badness 1577) in paragraph at lines 26--28
 cing,
  []
 
-<MIMO.jpg, id=1, 1927.2pt x 939.51pt>
-File: MIMO.jpg Graphic file (type jpg)
-<use MIMO.jpg>
-Package pdftex.def Info: MIMO.jpg  used on input line 37.
-(pdftex.def)             Requested size: 225.21626pt x 109.78317pt.
-LaTeX Font Info:    Try loading font information for U+msa on input line 38.
+LaTeX Font Info:    Try loading font information for U+msa on input line 36.
 ("D:\Program Files\MiKTeX\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 38.
+LaTeX Font Info:    Try loading font information for U+msb on input line 36.
 
 ("D:\Program Files\MiKTeX\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<OFDM.jpg, id=2, 1927.2pt x 939.51pt>
+<MIMO.jpg, id=1, 1927.2pt x 939.51pt>
+File: MIMO.jpg Graphic file (type jpg)
+<use MIMO.jpg>
+Package pdftex.def Info: MIMO.jpg  used on input line 94.
+(pdftex.def)             Requested size: 225.21626pt x 109.78317pt.
+ [1{C:/Users/nivelnola/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
+
+
+]
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 106.
+
+
+("D:\Program Files\MiKTeX\tex\latex\psnfss\ot1pcr.fd"
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+Overfull \hbox (1.75801pt too wide) in paragraph at lines 120--120
+[]\OT1/pcr/m/n/10 frame = [zeros(5, numFrames); ... % guard[] 
+ []
+
+
+Overfull \hbox (1.75801pt too wide) in paragraph at lines 120--120
+[]         \OT1/pcr/m/n/10 ones(1, numFrames); ...  % pilot[] 
+ []
+
+
+Overfull \hbox (1.75801pt too wide) in paragraph at lines 120--120
+[]         \OT1/pcr/m/n/10 ones(1, numFrames); ...  % pilot[] 
+ []
+
+
+Overfull \hbox (1.75801pt too wide) in paragraph at lines 120--120
+[]         \OT1/pcr/m/n/10 zeros(1, numFrames); ... % guard[] 
+ []
+
+
+Overfull \hbox (1.75801pt too wide) in paragraph at lines 120--120
+[]         \OT1/pcr/m/n/10 ones(1, numFrames); ...  % pilot[] 
+ []
+
+
+Overfull \hbox (1.75801pt too wide) in paragraph at lines 120--120
+[]         \OT1/pcr/m/n/10 ones(1, numFrames); ...  % pilot[] 
+ []
+
+
+Overfull \hbox (1.75801pt too wide) in paragraph at lines 120--120
+[]         \OT1/pcr/m/n/10 zeros(6, numFrames);];   % guard[] 
+ []
+
+<OFDM.jpg, id=17, 1927.2pt x 939.51pt>
 File: OFDM.jpg Graphic file (type jpg)
 <use OFDM.jpg>
-Package pdftex.def Info: OFDM.jpg  used on input line 46.
+Package pdftex.def Info: OFDM.jpg  used on input line 139.
 (pdftex.def)             Requested size: 225.21626pt x 109.78317pt.
-<MIMOOFDM.jpg, id=3, 1927.2pt x 939.51pt>
+<MIMOOFDM.jpg, id=18, 1927.2pt x 939.51pt>
 File: MIMOOFDM.jpg Graphic file (type jpg)
 <use MIMOOFDM.jpg>
-Package pdftex.def Info: MIMOOFDM.jpg  used on input line 55.
+Package pdftex.def Info: MIMOOFDM.jpg  used on input line 148.
 (pdftex.def)             Requested size: 225.21626pt x 109.78317pt.
-
 No file ASLevin_MIMOOFDM_Report.bbl.
-[1{C:/Users/nivelnola/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
-
-
- <./MIMO.jpg> <./OFDM.jpg> <./MIMOOFDM.jpg>] (ASLevin_MIMOOFDM_Report.aux) ) 
+[2 <./MIMO.jpg> <./OFDM.jpg> <./MIMOOFDM.jpg>] (ASLevin_MIMOOFDM_Report.aux) ) 
 Here is how much of TeX's memory you used:
- 4966 strings out of 492973
- 75968 string characters out of 3137680
- 150871 words of memory out of 3000000
- 8735 multiletter control sequences out of 15000+200000
- 36694 words of font info for 77 fonts, out of 3000000 for 9000
+ 5017 strings out of 492973
+ 76619 string characters out of 3137680
+ 156871 words of memory out of 3000000
+ 8775 multiletter control sequences out of 15000+200000
+ 40947 words of font info for 90 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,6n,37p,292b,266s stack positions out of 5000i,500n,10000p,200000b,50000s
-{D:
-/Program Files/MiKTeX/fonts/enc/dvips/base/8r.enc}<D:/Program Files/MiKTeX/font
-s/type1/public/amsfonts/cm/cmr8.pfb><D:/Program Files/MiKTeX/fonts/type1/public
-/amsfonts/cm/cmsy8.pfb><D:/Program Files/MiKTeX/fonts/type1/urw/times/utmb8a.pf
-b><D:/Program Files/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><D:/Program Files/
-MiKTeX/fonts/type1/urw/times/utmr8a.pfb>
-Output written on ASLevin_MIMOOFDM_Report.pdf (1 page, 460943 bytes).
+ 41i,8n,37p,424b,268s stack positions out of 5000i,500n,10000p,200000b,50000s
+{
+D:/Program Files/MiKTeX/fonts/enc/dvips/base/8r.enc}<D:/Program Files/MiKTeX/fo
+nts/type1/public/amsfonts/cm/cmbx10.pfb><D:/Program Files/MiKTeX/fonts/type1/pu
+blic/amsfonts/cm/cmmi10.pfb><D:/Program Files/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmmi7.pfb><D:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pf
+b><D:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><D:/Program 
+Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><D:/Program Files/MiKTeX/f
+onts/type1/public/amsfonts/cm/cmsy10.pfb><D:/Program Files/MiKTeX/fonts/type1/p
+ublic/amsfonts/cm/cmsy7.pfb><D:/Program Files/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmsy8.pfb><D:/Program Files/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><D:/
+Program Files/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><D:/Program Files/MiKTeX/
+fonts/type1/urw/times/utmbi8a.pfb><D:/Program Files/MiKTeX/fonts/type1/urw/time
+s/utmr8a.pfb><D:/Program Files/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on ASLevin_MIMOOFDM_Report.pdf (2 pages, 559566 bytes).
 PDF statistics:
- 30 PDF objects out of 1000 (max. 8388607)
+ 69 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
